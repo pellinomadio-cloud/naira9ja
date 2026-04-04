@@ -16,7 +16,7 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
             <Icons.Zap size={40} fill="currentColor" />
         </div>
         <h2 className="text-2xl font-black text-white uppercase tracking-tight">VIP Membership</h2>
-        <p className="text-sm text-gray-500">Unlock the full power of Earnix9ja with a lifetime professional VIP status.</p>
+        <p className="text-sm text-gray-500">Unlock the full power of Naira9ja with a lifetime professional VIP status.</p>
       </div>
 
       {/* Benefits Card */}

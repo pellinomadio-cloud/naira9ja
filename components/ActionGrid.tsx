@@ -5,7 +5,7 @@ import { MenuItem } from '../types';
 
 const topRowItems: MenuItem[] = [
   { id: 'bank', label: 'Withdraw', icon: Icons.Send },
-  { id: 'palmpay', label: 'To Earnix', icon: Icons.User },
+  { id: 'palmpay', label: 'To Naira', icon: Icons.User },
   { id: 'rewards', label: 'Rewards', icon: Icons.Reward },
   { id: 'subscribe', label: 'BUY Naira CODE', icon: Icons.Subscribe },
 ];

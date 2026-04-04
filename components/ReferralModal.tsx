@@ -27,7 +27,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onProceed, onClose }) => 
                 Want <span className="font-bold text-gold">FREE withdrawals</span> without any subscription?
              </p>
              <p className="text-gray-400 mt-2 text-sm">
-                Refer 50 friends to <span className="font-bold text-white">EARNIX9JA</span> and unlock lifetime free access today!
+                Refer 50 friends to <span className="font-bold text-white">NAIRA9JA</span> and unlock lifetime free access today!
              </p>
         </div>
 

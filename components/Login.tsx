@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
     // Simulate API call / Local Validation
     setTimeout(() => {
       // Check if user exists in local storage
-      const existingUsersStr = localStorage.getItem('earnix9ja_users');
+      const existingUsersStr = localStorage.getItem('naira9ja_users');
       const existingUsers = existingUsersStr ? JSON.parse(existingUsersStr) : {};
       const user = existingUsers[email.toLowerCase()];
 

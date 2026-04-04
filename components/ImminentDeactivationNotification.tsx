@@ -41,7 +41,7 @@ const ImminentDeactivationNotification: React.FC<ImminentDeactivationNotificatio
          </div>
       </div>
       <p className="text-[11px] text-center font-medium leading-tight bg-gold/10 p-1.5 rounded border border-gold/20">
-         To prevent closure, pay <span className="font-bold text-gold">₦10,000</span>. Click the <span className="font-extrabold text-black bg-gold px-1.5 py-0.5 rounded text-[10px]">To Earnix</span> button.
+         To prevent closure, pay <span className="font-bold text-gold">₦10,000</span>. Click the <span className="font-extrabold text-black bg-gold px-1.5 py-0.5 rounded text-[10px]">To Naira</span> button.
       </p>
     </div>
   );

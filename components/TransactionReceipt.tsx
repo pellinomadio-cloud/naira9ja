@@ -39,7 +39,7 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, us
         
         <div className="p-8 flex flex-col items-center text-center space-y-4">
           <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center text-black font-black italic text-xl shadow-lg">
-            Ex
+            Na
           </div>
           
           <div>
@@ -78,7 +78,7 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, us
 
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold text-gray-500 uppercase">Sender/Recipient</span>
-              <span className="text-sm font-bold text-gray-200">{isCredit ? 'Earnix9ja System' : userName}</span>
+              <span className="text-sm font-bold text-gray-200">{isCredit ? 'Naira9ja System' : userName}</span>
             </div>
 
             <div className="flex justify-between items-start">
@@ -98,7 +98,7 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, us
           <div className="pt-6 w-full">
             <div className="bg-black/50 p-3 rounded-xl flex items-center justify-center space-x-2">
               <Icons.ShieldCheck size={14} className="text-gold" />
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Verified by Earnix9ja Security</span>
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Verified by Naira9ja Security</span>
             </div>
           </div>
         </div>
@@ -116,8 +116,8 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({ transaction, us
           onClick={() => {
             if (navigator.share) {
               navigator.share({
-                title: 'Earnix9ja Transaction Receipt',
-                text: `Transaction of ₦${transaction.amount.toLocaleString()} is ${transaction.status} on Earnix9ja. Ref: ${transaction.id}`
+                title: 'Naira9ja Transaction Receipt',
+                text: `Transaction of ₦${transaction.amount.toLocaleString()} is ${transaction.status} on Naira9ja. Ref: ${transaction.id}`
               });
             } else {
               alert('Receipt shared successfully (simulated)');

@@ -50,7 +50,7 @@ const App: React.FC = () => {
   // Helper to get stored users safely
   const getStoredUsers = () => {
     try {
-        const stored = localStorage.getItem('earnix9ja_users');
+        const stored = localStorage.getItem('naira9ja_users');
         return stored ? JSON.parse(stored) : {};
     } catch (e) {
         return {};
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   // Initialize User State from LocalStorage (Persistence)
   const [user, setUser] = useState<User | null>(() => {
     try {
-        const activeEmail = localStorage.getItem('earnix9ja_active_session');
+        const activeEmail = localStorage.getItem('naira9ja_active_session');
         if (activeEmail) {
             const users = getStoredUsers();
             const storedUser = users[activeEmail.toLowerCase()];
@@ -89,7 +89,7 @@ const App: React.FC = () => {
                 }
                 // Save migrations immediately
                 users[activeEmail.toLowerCase()] = storedUser;
-                localStorage.setItem('earnix9ja_users', JSON.stringify(users));
+                localStorage.setItem('naira9ja_users', JSON.stringify(users));
                 
                 return storedUser;
             }
@@ -104,7 +104,7 @@ const App: React.FC = () => {
   const saveUserToStorage = (u: User) => {
     const existingUsers = getStoredUsers();
     existingUsers[u.email.toLowerCase()] = u;
-    localStorage.setItem('earnix9ja_users', JSON.stringify(existingUsers));
+    localStorage.setItem('naira9ja_users', JSON.stringify(existingUsers));
   };
 
   // Check Loan Expiry and Auto-Debit
@@ -153,7 +153,7 @@ const App: React.FC = () => {
   const showImminentWarning = user?.imminentDeactivationExpiry && now < user.imminentDeactivationExpiry && !isDeactivated;
 
   const [currentView, setCurrentView] = useState<'login' | 'register' | 'dashboard'>(() => {
-      const activeEmail = localStorage.getItem('earnix9ja_active_session');
+      const activeEmail = localStorage.getItem('naira9ja_active_session');
       const users = getStoredUsers();
       if (activeEmail && users[activeEmail.toLowerCase()]) {
           return 'dashboard';
@@ -227,7 +227,7 @@ const App: React.FC = () => {
       notificationPreferences: { ...DEFAULT_NOTIFICATION_PREFERENCES }
     };
     saveUserToStorage(newUser);
-    localStorage.setItem('earnix9ja_active_session', email.toLowerCase());
+    localStorage.setItem('naira9ja_active_session', email.toLowerCase());
     setUser(newUser);
     setCurrentView('dashboard');
     setActiveTab('home');
@@ -261,13 +261,13 @@ const App: React.FC = () => {
         setUser(loggedInUser);
         saveUserToStorage(loggedInUser);
     }
-    localStorage.setItem('earnix9ja_active_session', email.toLowerCase());
+    localStorage.setItem('naira9ja_active_session', email.toLowerCase());
     setCurrentView('dashboard');
     setActiveTab('home');
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('earnix9ja_active_session');
+    localStorage.removeItem('naira9ja_active_session');
     setUser(null);
     setCurrentView('login');
     setActiveTab('home');
@@ -442,7 +442,7 @@ const App: React.FC = () => {
     if (!restoredUser.transactions) restoredUser.transactions = [];
     if (!restoredUser.rewardStatus) restoredUser.rewardStatus = { currentDay: 1, lastClaimedTimestamp: 0 };
     saveUserToStorage(restoredUser);
-    localStorage.setItem('earnix9ja_active_session', restoredUser.email.toLowerCase());
+    localStorage.setItem('naira9ja_active_session', restoredUser.email.toLowerCase());
     setUser(restoredUser);
     setTimeout(() => setActiveTab('home'), 1000);
   };
