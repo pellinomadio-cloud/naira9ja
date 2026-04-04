@@ -12,7 +12,7 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
     <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center p-4 bg-gold/10 rounded-full text-gold mb-2">
+        <div className="inline-flex items-center justify-center p-4 bg-green-neon/10 rounded-full text-green-neon mb-2">
             <Icons.Zap size={40} fill="currentColor" />
         </div>
         <h2 className="text-2xl font-black text-white uppercase tracking-tight">VIP Membership</h2>
@@ -31,7 +31,7 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
                 "Exclusive investment opportunities"
             ].map((benefit, i) => (
                 <li key={i} className="flex items-center space-x-3 text-sm text-gray-400">
-                    <Icons.CheckCircle size={18} className="text-gold shrink-0" />
+                    <Icons.CheckCircle size={18} className="text-green-neon shrink-0" />
                     <span>{benefit}</span>
                 </li>
             ))}
@@ -39,8 +39,8 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
       </div>
 
       {/* Price Section */}
-      <div className="bg-gold/5 rounded-2xl p-6 text-center border-2 border-gold/20">
-        <p className="text-xs font-bold text-gold uppercase tracking-widest mb-1">One-Time VIP Fee</p>
+      <div className="bg-green-neon/5 rounded-2xl p-6 text-center border-2 border-green-neon/20">
+        <p className="text-xs font-bold text-green-neon uppercase tracking-widest mb-1">One-Time VIP Fee</p>
         <h4 className="text-4xl font-black text-white">₦15,000</h4>
         <p className="text-[10px] text-gray-500 mt-2 italic">Lifetime activation • No recurring charges</p>
       </div>
@@ -49,12 +49,12 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
       <div className="space-y-3">
           <button 
             onClick={onProceed}
-            className="w-full py-4 bg-gold hover:bg-gold-dark text-black font-black rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full py-4 bg-green-neon hover:bg-green-dark text-black font-black rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center space-x-2"
           >
               <span>Proceed to VIP</span>
               <Icons.ArrowRight size={20} />
           </button>
-          <button onClick={onBack} className="w-full py-3 text-gray-500 font-medium hover:text-gold text-sm">
+          <button onClick={onBack} className="w-full py-3 text-gray-500 font-medium hover:text-green-neon text-sm">
             Maybe Later
           </button>
       </div>

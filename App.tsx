@@ -25,7 +25,6 @@ import UpgradeProposal from './components/UpgradeProposal';
 import UpgradePayment from './components/UpgradePayment';
 import BuyNairaCode from './components/BuyNairaCode';
 import BusinessHub from './components/BusinessHub';
-import NotificationFeed from './components/NotificationFeed';
 import Loan from './components/Loan';
 import { Icons } from './components/Icons';
 import { User, Transaction, RewardStatus } from './types';
@@ -40,7 +39,6 @@ const DEFAULT_NOTIFICATION_PREFERENCES = {
 const App: React.FC = () => {
   // Global Time State for Deactivation & Subscription Logic
   const [now, setNow] = useState(Date.now());
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -182,7 +180,7 @@ const App: React.FC = () => {
     } else if (activeTab === 'receipt') {
         setActiveTab('transaction_history');
         setSelectedTransaction(null);
-    } else if (activeTab === 'send_money' || activeTab === 'buy_service' || activeTab === 'transaction_history' || activeTab === 'invite_earn' || activeTab === 'reward' || activeTab === 'imminent_payment' || activeTab === 'referral_dashboard' || activeTab === 'upgrade_proposal' || activeTab === 'business_hub' || activeTab === 'notifications' || activeTab === 'me' || activeTab === 'finance' || activeTab === 'loan') {
+    } else if (activeTab === 'send_money' || activeTab === 'buy_service' || activeTab === 'transaction_history' || activeTab === 'invite_earn' || activeTab === 'reward' || activeTab === 'imminent_payment' || activeTab === 'referral_dashboard' || activeTab === 'upgrade_proposal' || activeTab === 'business_hub' || activeTab === 'me' || activeTab === 'finance' || activeTab === 'loan') {
         setActiveTab('home');
     } else {
         setActiveTab('home');
@@ -234,7 +232,6 @@ const App: React.FC = () => {
     setCurrentView('dashboard');
     setActiveTab('home');
     setShowWelcomeAd(true);
-    setHasUnreadNotifications(true);
   };
 
   const handleLogin = (email: string, name: string) => {
@@ -267,7 +264,6 @@ const App: React.FC = () => {
     localStorage.setItem('earnix9ja_active_session', email.toLowerCase());
     setCurrentView('dashboard');
     setActiveTab('home');
-    setHasUnreadNotifications(true);
   };
 
   const handleLogout = () => {
@@ -543,7 +539,7 @@ const App: React.FC = () => {
     'invite_earn': 'Quiz Game', 'imminent_payment': 'Activation', 
     'referral_dashboard': taskMode === 'quiz' ? 'Quiz Game' : taskMode === 'telegram' ? 'Task' : 'Tasks',
     'upgrade_proposal': 'VIP Membership', 'upgrade_payment': 'Confirm VIP Status', 'buy_naira_code': 'Buy Naira CODE', 'business_hub': 'Business Hub',
-    'notifications': 'Feed', 'receipt': 'Receipt'
+    'receipt': 'Receipt'
   };
 
   return (
@@ -551,13 +547,11 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-black font-sans text-white transition-colors duration-200">
         <div className="max-w-md mx-auto bg-black min-h-screen relative shadow-2xl transition-colors duration-200">
           <div className="pb-24">
-              {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'notifications' && activeTab !== 'receipt' && activeTab !== 'loan' && (
+              {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'receipt' && activeTab !== 'loan' && (
                   <Header 
                     userName={user?.name} profileImage={user?.profileImage} 
                     onLogout={handleLogout} showBack={activeTab !== 'home'}
                     onBack={handleBack} pageTitle={pageTitles[activeTab]}
-                    hasUnread={hasUnreadNotifications}
-                    onNotificationClick={() => { setActiveTab('notifications'); setHasUnreadNotifications(false); }}
                   />
               )}
               {activeTab === 'me' ? (
@@ -574,8 +568,6 @@ const App: React.FC = () => {
                 <BuyNairaCode onBack={handleBack} />
               ) : (activeTab === 'business_hub' || activeTab === 'finance') && user ? (
                 <BusinessHub user={user} onVipWithdraw={handleVipWithdraw} onBack={handleBack} />
-              ) : activeTab === 'notifications' ? (
-                <NotificationFeed onBack={handleBack} />
               ) : activeTab === 'send_money' ? (
                 <SendMoney user={user!} onTransfer={handleTransfer} onSubscribeRedirect={() => window.open('https://t.me/naira9ja001', '_blank')} onGoHome={() => setActiveTab('home')} />
               ) : activeTab === 'buy_service' ? (
@@ -611,18 +603,6 @@ const App: React.FC = () => {
                 />
               ) : (
                  <main className="px-4 py-2 space-y-4 animate-in fade-in duration-500">
-                    {hasUnreadNotifications && (
-                      <div onClick={() => { setActiveTab('notifications'); setHasUnreadNotifications(false); }} className="bg-green-neon text-black p-3 rounded-xl shadow-lg flex items-center justify-between cursor-pointer border border-green-dark animate-in slide-in-from-top-4 duration-500">
-                         <div className="flex items-center space-x-2">
-                            <Icons.MessageCircle fill="currentColor" size={18} className="text-black/70" />
-                            <span className="text-sm font-black uppercase tracking-tight">New Message Arrived</span>
-                         </div>
-                         <div className="flex items-center space-x-1">
-                            <span className="text-[10px] font-bold bg-black/10 px-2 py-0.5 rounded">VIEW FEED</span>
-                            <Icons.ChevronRight size={14} />
-                         </div>
-                      </div>
-                    )}
                     {user?.isVIP && (
                       <div className="bg-gradient-to-r from-green-neon to-green-dark text-black p-3 rounded-xl shadow-md flex items-center justify-between animate-in slide-in-from-top-4 duration-500">
                          <div className="flex items-center space-x-2">
@@ -657,7 +637,7 @@ const App: React.FC = () => {
                 </main>
               )}
           </div>
-          {activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'notifications' && activeTab !== 'receipt' && (
+          {activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'receipt' && (
             <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} user={user} />
           )}
           {showWelcomeAd && (

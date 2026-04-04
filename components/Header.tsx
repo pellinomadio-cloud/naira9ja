@@ -9,8 +9,6 @@ interface HeaderProps {
   showBack?: boolean;
   onBack?: () => void;
   pageTitle?: string;
-  onNotificationClick?: () => void;
-  hasUnread?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
@@ -19,9 +17,7 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
   showBack = false,
   onBack,
-  pageTitle,
-  onNotificationClick,
-  hasUnread = false
+  pageTitle
 }) => {
   // Get initials safely
   const initials = userName.length >= 2 ? userName.substring(0, 2).toUpperCase() : userName.substring(0, 1).toUpperCase();
@@ -63,17 +59,6 @@ const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center space-x-3 text-gray-300">
         <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
             <Icons.Support size={24} />
-        </button>
-        <button 
-          onClick={onNotificationClick}
-          className="p-1 relative hover:bg-gray-800 rounded-full transition-colors"
-        >
-            <Icons.Notification size={24} />
-            {hasUnread && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-black animate-pulse">
-                  New
-              </span>
-            )}
         </button>
       </div>
     </div>
