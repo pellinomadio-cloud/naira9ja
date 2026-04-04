@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-green-neon: #39FF14;
+  --color-green-light: #7CFF6B;
+  --color-green-dark: #008000;
+  
+  --shadow-green: 0 0 15px rgba(57, 255, 20, 0.4);
+  --shadow-green-lg: 0 0 25px rgba(57, 255, 20, 0.6);
+  
+  --drop-shadow-green: 0 0 8px rgba(57, 255, 20, 0.5);
+  
+  --animate-green-pulse: green-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes green-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .8; transform: scale(1.02); filter: brightness(1.2); }
+  }
+}
+
+@layer utilities {
+  .glow-green {
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+  }
+  
+  .glow-green-lg {
+    box-shadow: 0 0 35px rgba(57, 255, 20, 0.7);
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+  }
+
+  .animate-green-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.3), transparent);
+    background-size: 200% 100%;
+    animation: green-shimmer 3s infinite linear;
+  }
+}
+
+@keyframes green-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Override some default styles for a more "premium" feel */
+.bg-green-neon {
+  background-color: #39FF14;
+  background-image: linear-gradient(135deg, #39FF14 0%, #7CFF6B 50%, #008000 100%);
+}
+
+.text-green-neon {
+  color: #39FF14;
+  filter: drop-shadow(0 0 2px rgba(57, 255, 20, 0.3));
+}
