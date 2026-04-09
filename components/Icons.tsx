@@ -50,7 +50,9 @@ import {
   MessageCircle,
   Snowflake,
   Ban,
-  Zap
+  Zap,
+  Radio,
+  Scan
 } from 'lucide-react';
 
 // Exporting icons for easy import elsewhere
@@ -110,5 +112,7 @@ export const Icons = {
   Star,
   Snowflake,
   Ban,
-  Zap
+  Zap,
+  Radio,
+  Scan
 };

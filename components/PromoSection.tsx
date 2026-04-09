@@ -1,42 +1,25 @@
 import React from 'react';
+import { Icons } from './Icons';
 
 const PromoSection: React.FC = () => {
   return (
-    <div className="bg-gray-900 rounded-xl p-4 shadow-sm mt-4 transition-colors duration-200 border border-gray-800">
-      <div className="grid grid-cols-2 gap-3">
-        {/* Fixed Savings Card */}
-        <div className="bg-green-neon/10 rounded-xl p-3 relative overflow-hidden border border-green-neon/20 transition-colors">
-             {/* Hot Badge */}
-            <div className="absolute top-0 right-0">
-                <div className="w-0 h-0 border-t-[40px] border-t-green-neon border-l-[40px] border-l-transparent absolute top-0 right-0"></div>
-                <span className="absolute top-1 right-1 text-black text-[10px] font-bold rotate-45">HOT</span>
-            </div>
-            
-            <h3 className="text-green-neon font-bold text-sm mb-1">Fixed Savings</h3>
-            <p className="text-xs text-gray-400 mb-2 leading-tight">Get Cash Reward on Deposit</p>
-            <p className="text-green-400 font-bold text-lg">₦20,000</p>
-            <p className="text-[10px] text-gray-500 mb-3">Cash</p>
-            <button className="bg-green-neon hover:bg-green-dark text-black text-xs font-bold py-1.5 px-6 rounded-full w-full shadow-md transition-all">
-                Claim
-            </button>
+    <div className="space-y-4">
+      {/* Secondary Promo Row (Optional but adds to the aesthetic) */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 mb-3">
+            <Icons.Savings size={20} />
+          </div>
+          <h4 className="text-xs font-bold text-gray-800">Fixed Savings</h4>
+          <p className="text-[10px] text-gray-400 mt-1">Earn up to 20% p.a.</p>
         </div>
-
-        {/* SmartEarn Card */}
-        <div className="bg-green-neon/10 rounded-xl p-3 relative border border-green-neon/20 transition-colors">
-            <h3 className="text-green-neon font-bold text-sm mb-1">SmartEarn</h3>
-            <p className="text-xs text-gray-400 mb-2 leading-tight">Save Smarter, Earn PLUS Return</p>
-            <p className="text-green-400 font-bold text-lg">21.26%</p>
-            <p className="text-[10px] text-gray-500 mb-3">Annual Yield</p>
-            <button className="bg-green-neon hover:bg-green-dark text-black text-xs font-bold py-1.5 px-6 rounded-full w-full shadow-md transition-all">
-                Save
-            </button>
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-green-500 mb-3">
+            <Icons.Zap size={20} />
+          </div>
+          <h4 className="text-xs font-bold text-gray-800">SmartEarn</h4>
+          <p className="text-[10px] text-gray-400 mt-1">Daily returns on cash</p>
         </div>
-      </div>
-      
-      <div className="text-center mt-3">
-        <button className="text-xs text-gray-500 hover:text-green-neon flex items-center justify-center mx-auto transition-colors">
-            More Wealth Product <span className="ml-1">›</span>
-        </button>
       </div>
     </div>
   );

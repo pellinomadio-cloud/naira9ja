@@ -1,40 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-green-neon: #39FF14;
-  --color-green-light: #7CFF6B;
-  --color-green-dark: #008000;
+  --color-primary-blue: #0055FF;
+  --color-primary-dark: #0044CC;
+  --color-primary-light: #E6EEFF;
+  --color-gold: #FFD700;
+  --color-bg-gray: #F5F5F5;
   
-  --shadow-green: 0 0 15px rgba(57, 255, 20, 0.4);
-  --shadow-green-lg: 0 0 25px rgba(57, 255, 20, 0.6);
-  
-  --drop-shadow-green: 0 0 8px rgba(57, 255, 20, 0.5);
-  
-  --animate-green-pulse: green-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  
-  @keyframes green-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .8; transform: scale(1.02); filter: brightness(1.2); }
-  }
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 @layer utilities {
-  .glow-green {
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+  .bg-primary-blue {
+    background-color: #0055FF;
   }
   
-  .glow-green-lg {
-    box-shadow: 0 0 35px rgba(57, 255, 20, 0.7);
+  .text-primary-blue {
+    color: #0055FF;
   }
 
-  .text-glow-green {
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
-  }
-
-  .animate-green-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.3), transparent);
-    background-size: 200% 100%;
-    animation: green-shimmer 3s infinite linear;
+  .card-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 }
 

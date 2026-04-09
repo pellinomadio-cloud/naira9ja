@@ -19,47 +19,48 @@ const Header: React.FC<HeaderProps> = ({
   onBack,
   pageTitle
 }) => {
-  // Get initials safely
   const initials = userName.length >= 2 ? userName.substring(0, 2).toUpperCase() : userName.substring(0, 1).toUpperCase();
   const firstName = userName.split(' ')[0];
 
-  return (
-    <div className="bg-black px-4 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm transition-colors duration-200 border-b border-gray-800">
-      <div className="flex items-center space-x-2">
-        {showBack ? (
-          <>
-            <button 
-              onClick={onBack} 
-              className="p-2 -ml-2 mr-1 hover:bg-gray-800 rounded-full transition-colors text-white"
-            >
-              <Icons.ArrowLeft size={24} />
-            </button>
-            <span className="font-bold text-white text-lg">{pageTitle}</span>
-          </>
-        ) : (
-          <>
-            <div className="relative group">
-              <div className="w-8 h-8 rounded-full bg-green-neon flex items-center justify-center text-black font-bold italic text-sm overflow-hidden shadow-green group-hover:shadow-green-lg transition-all duration-300">
-                  {profileImage ? (
-                    <img src={profileImage} alt="User" className="w-full h-full object-cover" />
-                  ) : (
-                    initials
-                  )}
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-1">
-                <span className={`font-semibold text-white text-lg truncate max-w-[150px]`}>Hi, {firstName}</span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-      
-      <div className="flex items-center space-x-3 text-gray-300">
-        <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
-            <Icons.Support size={24} />
+  if (showBack) {
+    return (
+      <div className="bg-white px-4 py-3 flex items-center sticky top-0 z-50 shadow-sm border-b border-gray-100">
+        <button 
+          onClick={onBack} 
+          className="p-2 -ml-2 mr-2 hover:bg-gray-100 rounded-full transition-colors text-black"
+        >
+          <Icons.ArrowLeft size={24} />
         </button>
+        <span className="font-bold text-black text-lg">{pageTitle}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-bg-gray px-4 pt-4 pb-2 space-y-4">
+      {/* Top Row */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+            <img 
+              src={profileImage || "https://picsum.photos/seed/user/100/100"} 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div className="bg-orange-50 px-2 py-0.5 rounded text-[10px] font-bold text-orange-500 border border-orange-100">
+            LVL 1
+          </div>
+        </div>
+        <div className="flex items-center space-x-4 text-gray-400">
+          <button className="relative">
+            <Icons.Notification size={24} />
+          </button>
+          <button>
+            <Icons.Radio size={24} />
+          </button>
+        </div>
       </div>
     </div>
   );

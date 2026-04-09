@@ -7,56 +7,26 @@ interface BalanceCardProps {
 }
 
 const BalanceCard: React.FC<BalanceCardProps> = ({ balance, onHistoryClick }) => {
-  const [isVisible, setIsVisible] = useState(true);
-
   const formatCurrency = (amount: number) => {
     return '₦' + amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   return (
-    <div className="bg-gradient-to-br from-green-light via-green-neon to-green-dark rounded-2xl p-4 mb-4 relative overflow-hidden transition-all duration-500 border border-green-dark shadow-green-lg group">
-        {/* Background decoration */}
-        <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/30 rounded-full mix-blend-overlay filter blur-2xl opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-        
-        <div className="relative z-10">
-            <div className="flex justify-between items-start mb-2">
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center space-x-2 text-black/70 text-sm font-medium">
-                        <div className="flex items-center text-black bg-white/30 px-2 py-0.5 rounded-full text-xs font-bold">
-                            <span className="mr-1">✓</span> Available Balance
-                        </div>
-                        <button onClick={() => setIsVisible(!isVisible)} className="text-black/60 hover:text-black transition-colors">
-                            {isVisible ? <Icons.Eye size={16} /> : <Icons.EyeOff size={16} />}
-                        </button>
-                    </div>
-                </div>
-                <button className="text-sm text-black/70 flex items-center font-medium hover:text-black transition-colors">
-                    Add Money <Icons.ChevronRight size={14} />
-                </button>
-            </div>
+    <div className="bg-primary-blue rounded-2xl p-5 mb-4 relative overflow-hidden shadow-medium">
+        <div className="flex justify-between items-center mb-2">
+            <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Available Balance</span>
+            <button 
+              onClick={onHistoryClick}
+              className="text-white/90 text-xs font-medium flex items-center hover:text-white transition-colors"
+            >
+              History <Icons.ChevronRight size={14} className="ml-0.5" />
+            </button>
+        </div>
 
-            <div className="flex justify-between items-end">
-                <div className="flex items-center">
-                    <h1 className="text-3xl font-extrabold text-black tracking-tight text-glow-green">
-                        {isVisible ? formatCurrency(balance) : '₦ •••••••'}
-                    </h1>
-                    <Icons.ChevronRight className="text-black ml-1" size={24} />
-                </div>
-                <button 
-                    onClick={onHistoryClick}
-                    className="bg-black hover:bg-gray-900 text-green-neon px-4 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all"
-                >
-                    Transaction History
-                </button>
-            </div>
-
-            <div className="mt-4 pt-2 border-t border-black/10 flex justify-between items-center">
-                <p className="text-xs text-black/80 font-medium flex items-center">
-                    <span className="bg-black text-green-neon text-[10px] px-1 rounded mr-2 font-bold">10</span>
-                    Higher return? Increase deposit with <span className="text-black ml-1 font-bold">20% p.a.</span>
-                </p>
-            </div>
+        <div className="flex items-baseline">
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+                {formatCurrency(balance)}
+            </h1>
         </div>
     </div>
   );

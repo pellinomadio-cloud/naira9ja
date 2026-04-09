@@ -49,21 +49,21 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 transition-colors duration-200">
+    <div className="min-h-screen bg-bg-gray flex flex-col items-center justify-center p-6 transition-colors duration-200">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-green-neon rounded-full flex items-center justify-center mb-4">
-            <span className="text-black font-bold text-2xl italic">n9</span>
+          <div className="mx-auto h-16 w-16 bg-primary-blue rounded-full flex items-center justify-center mb-4 shadow-lg">
+            <span className="text-white font-bold text-2xl italic tracking-tighter">n9</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-white">Welcome Back</h2>
-          <p className="mt-2 text-sm text-gray-400">Sign in to access your naira9ja dashboard</p>
+          <h2 className="text-3xl font-black text-gray-800 tracking-tight">Welcome Back</h2>
+          <p className="mt-2 text-sm text-gray-400 font-medium">Sign in to access your naira9ja dashboard</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             
             {error && (
-              <div className="bg-red-900/20 text-red-400 text-sm p-3 rounded-lg text-center border border-red-800">
+              <div className="bg-red-50 text-red-500 text-sm p-3 rounded-xl text-center border border-red-100 font-medium">
                 {error}
               </div>
             )}
@@ -71,15 +71,15 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
             <div>
               <label htmlFor="email" className="sr-only">Email address</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Icons.Mail className="h-5 w-5 text-gray-500" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Icons.Mail className="h-5 w-5 text-gray-300" />
                 </div>
                 <input
                   id="email"
                   name="email"
                   type="email"
                   required
-                  className="appearance-none rounded-lg relative block w-full pl-10 px-3 py-3 border border-gray-800 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-green-neon focus:border-green-neon sm:text-sm transition-all"
+                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue sm:text-sm transition-all shadow-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -89,8 +89,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
             <div>
               <label htmlFor="password" className="sr-only">4-digit PIN</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Icons.Lock className="h-5 w-5 text-gray-500" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Icons.Lock className="h-5 w-5 text-gray-300" />
                 </div>
                 <input
                   id="password"
@@ -100,7 +100,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                   pattern="[0-9]*"
                   maxLength={4}
                   required
-                  className="appearance-none rounded-lg relative block w-full pl-10 px-3 py-3 border border-gray-800 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-green-neon focus:border-green-neon sm:text-sm transition-all tracking-widest"
+                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue sm:text-sm transition-all shadow-sm tracking-widest"
                   placeholder="Enter 4-digit PIN"
                   value={password}
                   onChange={handlePasswordChange}
@@ -111,7 +111,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
 
           <div className="flex items-center justify-end">
             <div className="text-sm">
-              <a href="#" className="font-medium text-green-neon hover:text-green-light">
+              <a href="#" className="font-bold text-primary-blue hover:text-primary-dark">
                 Forgot your PIN?
               </a>
             </div>
@@ -121,12 +121,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-full text-black bg-green-neon hover:bg-green-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-neon shadow-lg transition-all disabled:opacity-70"
+              className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-black rounded-2xl text-white bg-primary-blue hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue shadow-lg transition-all disabled:opacity-70"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
               {!isLoading && (
                  <span className="absolute right-4 inset-y-0 flex items-center pl-3">
-                    <Icons.ArrowRight className="h-5 w-5 text-black/50 group-hover:text-black" />
+                    <Icons.ArrowRight className="h-5 w-5 text-white/50 group-hover:text-white" />
                  </span>
               )}
             </button>
@@ -134,9 +134,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
         </form>
 
         <div className="text-center mt-4">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 font-medium">
                 Don't have an account?{' '}
-                <button onClick={onSwitchToRegister} className="font-bold text-green-neon hover:text-green-light">
+                <button onClick={onSwitchToRegister} className="font-bold text-primary-blue hover:text-primary-dark">
                     Register now
                 </button>
             </p>

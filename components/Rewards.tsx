@@ -49,74 +49,64 @@ const Rewards: React.FC<RewardsProps> = ({ currentDay, canClaim, onClaim, lastCl
   const progressPercentage = Math.min(((currentDay - 1) / 100) * 100, 100);
 
   return (
-    <div className="bg-black min-h-screen animate-in fade-in duration-500">
+    <div className="bg-bg-gray min-h-screen animate-in fade-in duration-500">
       <div className="px-4 py-4 space-y-6">
         
-        {/* Header with Green Back Button */}
+        {/* Header with Black Back Button */}
         <div className="flex items-center pt-2">
             <button 
                 onClick={onBack} 
-                className="bg-green-neon hover:bg-green-dark text-black px-6 py-2 rounded-full flex items-center text-sm font-bold shadow-md transition-colors"
+                className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-full flex items-center text-sm font-bold shadow-md transition-colors"
             >
                  <Icons.ArrowLeft size={18} className="mr-2" strokeWidth={3} /> Back
             </button>
-            <h1 className="ml-4 text-2xl font-bold text-green-neon text-glow-green">naira9ja</h1>
+            <h1 className="ml-4 text-2xl font-bold text-black">naira9ja</h1>
         </div>
 
         {/* Progress Card */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-green border border-green-neon/20">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-bold text-gray-300">Progress: {Math.round(progressPercentage)}%</span>
-                <span className="text-xs text-gray-500">{currentDay - 1}/100 days</span>
+                <span className="text-sm font-bold text-gray-400">Progress: {Math.round(progressPercentage)}%</span>
+                <span className="text-xs text-gray-300">{currentDay - 1}/100 days</span>
             </div>
-            <div className="w-full bg-black rounded-full h-4 border border-gray-800 overflow-hidden">
+            <div className="w-full bg-gray-50 rounded-full h-4 border border-gray-100 overflow-hidden">
                 <div 
-                    className="bg-green-neon h-4 rounded-full transition-all duration-500 shadow-green-lg animate-green-pulse"
+                    className="bg-black h-4 rounded-full transition-all duration-500"
                     style={{ width: `${progressPercentage}%` }}
                 ></div>
             </div>
         </div>
 
-        {/* Green Timer/Action Card */}
-        <div className="bg-green-neon rounded-3xl p-8 text-center text-black shadow-green-lg relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        {/* Black Timer/Action Card */}
+        <div className="bg-black rounded-3xl p-8 text-center text-white shadow-xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="relative z-10 flex flex-col items-center justify-center">
-                <div className="mb-4 bg-black rounded-full p-2 shadow-green">
-                     <Icons.Clock size={32} className="text-green-neon" fill="currentColor" />
+                <div className="mb-4 bg-white/10 rounded-full p-2">
+                     <Icons.Clock size={32} className="text-white" fill="currentColor" />
                 </div>
                 
                 {!canClaim ? (
                     <>
-                        <p className="text-black/70 text-sm mb-2 font-medium">Next reward available in:</p>
-                        <div className="bg-black/10 backdrop-blur-sm rounded-xl px-6 py-2 mb-2 border border-black/5">
+                        <p className="text-white/70 text-sm mb-2 font-medium">Next reward available in:</p>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-2 mb-2 border border-white/5">
                              <h2 className="text-3xl font-mono font-bold tracking-widest">{timeLeft}</h2>
                         </div>
-                         <div className="mt-2 px-8 py-3 bg-black/10 backdrop-blur-md text-black/50 font-bold text-lg rounded-xl border border-black/10">
+                         <div className="mt-2 px-8 py-3 bg-white/5 text-white/30 font-bold text-lg rounded-xl border border-white/10">
                             Claimed for today
                         </div>
                     </>
                 ) : (
                     <div className="mb-2 w-full">
-                        <p className="text-black/70 text-sm mb-2 font-medium">Your reward is ready!</p>
+                        <p className="text-white/70 text-sm mb-2 font-medium">Your reward is ready!</p>
                          <button 
                             onClick={onClaim}
-                            className="w-full px-8 py-4 bg-black text-green-neon font-bold text-xl rounded-xl transition-all shadow-green-lg animate-green-glow-button flex items-center justify-center"
+                            className="w-full px-8 py-4 bg-white text-black font-bold text-xl rounded-xl transition-all shadow-lg flex items-center justify-center"
                         >
                             Ready to Claim! 🎉
                         </button>
                     </div>
                 )}
             </div>
-            <style>{`
-              @keyframes green-glow-button {
-                0% { box-shadow: 0 0 5px rgba(57, 255, 20, 0.4); filter: brightness(1); }
-                50% { box-shadow: 0 0 25px rgba(57, 255, 20, 0.9); filter: brightness(1.4); }
-                100% { box-shadow: 0 0 5px rgba(57, 255, 20, 0.4); filter: brightness(1); }
-              }
-              .animate-green-glow-button {
-                animation: green-glow-button 2s infinite ease-in-out;
-              }
-            `}</style>
         </div>
 
         {/* Days Grid */}
@@ -131,29 +121,29 @@ const Rewards: React.FC<RewardsProps> = ({ currentDay, canClaim, onClaim, lastCl
                         className={`
                             aspect-[4/5] rounded-2xl flex flex-col items-center justify-center p-1 border transition-all
                             ${isClaimed 
-                                ? 'bg-gray-900 border-green-neon shadow-[0_0_5px_rgba(57,255,20,0.1)]' 
+                                ? 'bg-white border-black shadow-sm' 
                                 : isCurrent && canClaim
-                                    ? 'bg-gray-900 border-green-neon shadow-lg transform scale-105 z-10 ring-1 ring-green-neon/50' 
-                                    : 'bg-gray-900/50 border-gray-800'
+                                    ? 'bg-white border-black shadow-lg transform scale-105 z-10 ring-1 ring-black/20' 
+                                    : 'bg-white border-gray-100'
                             }
                         `}
                     >
-                        <span className="text-[10px] font-medium text-gray-500 mb-1">Day {day}</span>
-                        <span className={`text-[9px] font-black mb-2 ${isClaimed || isCurrent ? 'text-green-neon' : 'text-gray-600'}`}>
+                        <span className="text-[10px] font-medium text-gray-400 mb-1">Day {day}</span>
+                        <span className={`text-[9px] font-black mb-2 ${isClaimed || isCurrent ? 'text-black' : 'text-gray-300'}`}>
                             ₦100,000
                         </span>
                         {isClaimed && (
-                            <div className="flex items-center text-[8px] text-green-neon font-bold bg-green-neon/10 px-1.5 py-0.5 rounded-full">
+                            <div className="flex items-center text-[8px] text-black font-bold bg-gray-100 px-1.5 py-0.5 rounded-full">
                                 <span className="mr-0.5">✓</span> Claimed
                             </div>
                         )}
                          {isCurrent && !isClaimed && (
-                            <span className={`text-[8px] ${canClaim ? 'bg-green-neon text-black animate-pulse' : 'bg-gray-800 text-gray-500'} px-2 py-0.5 rounded-full font-bold`}>
+                            <span className={`text-[8px] ${canClaim ? 'bg-black text-white animate-pulse' : 'bg-gray-100 text-gray-400'} px-2 py-0.5 rounded-full font-bold`}>
                                 {canClaim ? 'Ready' : 'Locked'}
                             </span>
                         )}
                         {!isClaimed && !isCurrent && (
-                             <Icons.Lock size={12} className="text-gray-700" />
+                             <Icons.Lock size={12} className="text-gray-200" />
                         )}
                     </div>
                 );

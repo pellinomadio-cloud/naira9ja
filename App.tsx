@@ -544,8 +544,8 @@ const App: React.FC = () => {
 
   return (
     <div className={darkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-black font-sans text-white transition-colors duration-200">
-        <div className="max-w-md mx-auto bg-black min-h-screen relative shadow-2xl transition-colors duration-200">
+      <div className="min-h-screen bg-bg-gray font-sans text-black transition-colors duration-200">
+        <div className="max-w-md mx-auto bg-bg-gray min-h-screen relative shadow-2xl transition-colors duration-200">
           <div className="pb-24">
               {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'receipt' && activeTab !== 'loan' && (
                   <Header 
@@ -632,6 +632,54 @@ const App: React.FC = () => {
                       onHistoryClick={() => setActiveTab('transaction_history')} 
                     />
                     <ActionGrid onActionClick={handleGridAction} />
+                    
+                    {/* Recent Transactions Section */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                      <div className="flex justify-between items-center mb-4 px-1">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Recent Transactions</h3>
+                        <button 
+                          onClick={() => setActiveTab('transaction_history')}
+                          className="text-xs font-bold text-primary-blue"
+                        >
+                          View All
+                        </button>
+                      </div>
+                      <div className="divide-y divide-gray-50">
+                        {(user?.transactions || []).slice(0, 3).map((trx) => (
+                          <div 
+                            key={trx.id} 
+                            onClick={() => {
+                              setSelectedTransaction(trx);
+                              setActiveTab('receipt');
+                            }}
+                            className="py-3 flex items-center justify-between cursor-pointer active:opacity-70"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                trx.type === 'credit' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'
+                              }`}>
+                                {trx.type === 'credit' ? <Icons.ArrowDownLeft size={20} /> : <Icons.ArrowUpRight size={20} />}
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-gray-800 truncate max-w-[140px]">{trx.description}</p>
+                                <p className="text-[10px] text-gray-400 font-medium">{new Date(trx.date).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-sm font-bold ${trx.type === 'credit' ? 'text-green-500' : 'text-gray-800'}`}>
+                                {trx.type === 'credit' ? '+' : '-'}₦{trx.amount.toLocaleString()}
+                              </p>
+                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                                trx.status === 'success' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
+                              }`}>
+                                {trx.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     <PromoSection />
                     <Banner />
                 </main>
