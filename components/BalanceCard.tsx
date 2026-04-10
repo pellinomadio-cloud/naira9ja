@@ -7,14 +7,25 @@ interface BalanceCardProps {
 }
 
 const BalanceCard: React.FC<BalanceCardProps> = ({ balance, onHistoryClick }) => {
+  const [showBalance, setShowBalance] = useState(true);
+
   const formatCurrency = (amount: number) => {
+    if (!showBalance) return '₦ • • • • •';
     return '₦' + amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   return (
     <div className="bg-primary-blue rounded-2xl p-5 mb-4 relative overflow-hidden shadow-medium">
         <div className="flex justify-between items-center mb-2">
-            <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Available Balance</span>
+            <div className="flex items-center space-x-2">
+                <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Available Balance</span>
+                <button 
+                    onClick={() => setShowBalance(!showBalance)}
+                    className="text-white/60 hover:text-white transition-colors"
+                >
+                    {showBalance ? <Icons.Eye size={16} /> : <Icons.EyeOff size={16} />}
+                </button>
+            </div>
             <button 
               onClick={onHistoryClick}
               className="text-white/90 text-xs font-medium flex items-center hover:text-white transition-colors"
