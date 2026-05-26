@@ -70,7 +70,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                   name="name"
                   type="text"
                   required
-                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue sm:text-sm transition-all shadow-sm"
+                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] sm:text-sm transition-all shadow-sm"
                   placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -82,14 +82,14 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
               <label htmlFor="email" className="sr-only">Email address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Icons.Mail className="h-5 w-5 text-gray-300" />
+                  <Icons.Mail className="h-5 w-5 text-gray-300 animate-pulse" />
                 </div>
                 <input
                   id="email"
                   name="email"
                   type="email"
                   required
-                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue sm:text-sm transition-all shadow-sm"
+                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] sm:text-sm transition-all shadow-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -111,7 +111,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                   pattern="[0-9]*"
                   maxLength={4}
                   required
-                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue sm:text-sm transition-all shadow-sm tracking-widest"
+                  className="appearance-none rounded-2xl relative block w-full pl-12 px-4 py-4 border border-gray-100 placeholder-gray-300 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] sm:text-sm transition-all shadow-sm tracking-widest"
                   placeholder="Create 4-digit PIN"
                   value={password}
                   onChange={handlePasswordChange}

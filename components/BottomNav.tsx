@@ -46,9 +46,9 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, user }) 
         <div className="relative -top-6">
           <button 
             onClick={() => setActiveTab('send_money')}
-            className="w-14 h-14 bg-primary-blue rounded-full flex items-center justify-center text-white shadow-lg active:scale-95 transition-transform"
+            className="w-14 h-14 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-full flex items-center justify-center text-white shadow-[0_0_15px_rgba(6,182,212,0.6)] hover:shadow-[0_0_25px_rgba(6,182,212,0.8)] hover:scale-105 active:scale-95 transition-all animate-pulse"
           >
-            <Icons.Scan size={28} strokeWidth={2.5} />
+            <Icons.Scan size={26} strokeWidth={2.5} className="drop-shadow-[0_0_4px_rgba(255,255,255,0.7)]" />
           </button>
         </div>
 

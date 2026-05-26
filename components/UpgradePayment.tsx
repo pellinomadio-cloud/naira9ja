@@ -57,8 +57,8 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({ userEmail, onPaymentCom
   if (isFetching) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-in fade-in duration-500">
-        <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-black font-black uppercase tracking-widest animate-pulse">fetching management account...</p>
+        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(6,182,212,0.4)]"></div>
+        <p className="text-cyan-500 font-black uppercase tracking-widest animate-pulse drop-shadow-[0_0_4px_rgba(6,182,212,0.3)]">fetching management account...</p>
       </div>
     );
   }

@@ -1,27 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-blue: #0055FF;
-  --color-primary-dark: #0044CC;
-  --color-primary-light: #E6EEFF;
+  --color-primary-blue: #E53935; /* Vibrant banking RED */
+  --color-primary-dark: #C62828; /* Deeper crimson red */
+  --color-primary-light: #FFEBEE; /* Soft white/pinkish-red background */
   --color-gold: #FFD700;
-  --color-bg-gray: #F5F5F5;
+  --color-bg-gray: #FAFAFA; /* Ultra crisp premium light background */
   
-  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 @layer utilities {
   .bg-primary-blue {
-    background-color: #0055FF;
+    background-color: #E53935;
   }
   
   .text-primary-blue {
-    color: #0055FF;
+    color: #E53935;
   }
 
   .card-shadow {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Stunning glowing electric cyan-blue styles */
+  .text-glow-blue {
+    color: #00E5FF;
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.2);
+  }
+
+  .bg-glow-blue {
+    background-color: #00E5FF;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.5), 0 0 24px rgba(0, 229, 255, 0.2);
+  }
+
+  .border-glow-blue {
+    border-color: #00E5FF;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
   }
 }
 
@@ -30,7 +46,11 @@
   100% { background-position: 200% 0; }
 }
 
-/* Override some default styles for a more "premium" feel */
+/* Base styling and layout refinements */
+body {
+  background-color: #FAFAFA;
+}
+
 .bg-green-neon {
   background-color: #39FF14;
   background-image: linear-gradient(135deg, #39FF14 0%, #7CFF6B 50%, #008000 100%);

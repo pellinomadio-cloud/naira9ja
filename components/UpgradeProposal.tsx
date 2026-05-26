@@ -49,7 +49,7 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ onProceed, onBack }) 
       <div className="space-y-3">
           <button 
             onClick={onProceed}
-            className="w-full py-4 bg-black hover:bg-gray-800 text-white font-black rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full py-4 bg-black hover:bg-gray-900 border border-cyan-400/40 text-white font-black rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all transform active:scale-95 flex items-center justify-center space-x-2"
           >
               <span>Proceed to VIP</span>
               <Icons.ArrowRight size={20} />
