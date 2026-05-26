@@ -11,13 +11,13 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ onBack }) => {
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
 
   const handlePayNow = () => {
-    const accountNumber = "2189078733";
+    const accountNumber = "5276179936";
     navigator.clipboard.writeText(accountNumber);
     alert(
       `ACTIVATION DETAILS\n\n` +
-      `Bank: Smartcash\n` +
+      `Bank: Moniepoint MFB\n` +
       `Account Number: ${accountNumber}\n` +
-      `Account Name: RABIU ABDULLAHI\n\n` +
+      `Account Name: Awwal Onimsi Abdulsalam\n\n` +
       `AMOUNT: ₦10,000\n\n` +
       `Account number copied! Make payment and click "Verify" below.`
     );
@@ -78,19 +78,19 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ onBack }) => {
         <div className="grid grid-cols-2 gap-4 text-left border-t border-gray-800 pt-4">
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Bank Name</p>
-            <p className="text-sm font-black text-white">Smartcash</p>
+            <p className="text-sm font-black text-white">Moniepoint MFB</p>
           </div>
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Account Name</p>
-            <p className="text-sm font-black text-white">RABIU ABDULLAHI</p>
+            <p className="text-sm font-black text-white">Awwal Onimsi Abdulsalam</p>
           </div>
           <div className="col-span-2 space-y-1">
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Account Number</p>
             <div className="flex items-center justify-between bg-black p-3 rounded-xl border border-gray-800">
-              <p className="text-xl font-black text-gold tracking-wider">2189078733</p>
+              <p className="text-xl font-black text-gold tracking-wider">5276179936</p>
               <button 
                 onClick={() => {
-                  navigator.clipboard.writeText("2189078733");
+                  navigator.clipboard.writeText("5276179936");
                   alert("Account number copied to clipboard!");
                 }}
                 className="p-2 bg-gold/10 text-gold rounded-lg active:scale-90 transition-transform"
