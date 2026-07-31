@@ -1,4 +1,5 @@
 import { PaymentSubmission, PaymentType, PaymentStatus, User, NairaCodeData } from './types';
+import { savePaymentSubmissionToFirestore, saveUserToFirestore } from './firestoreService';
 
 const STORAGE_KEY = 'naira9ja_payment_submissions';
 
@@ -21,16 +22,18 @@ export const savePaymentSubmissions = (submissions: PaymentSubmission[]): void =
 };
 
 export const getUserPendingSubmission = (userEmail: string): PaymentSubmission | undefined => {
+  if (!userEmail) return undefined;
   const all = getAllPaymentSubmissions();
   return all.find(
-    (s) => s.userEmail.toLowerCase() === userEmail.toLowerCase() && s.status === 'pending'
+    (s) => s.userEmail && s.userEmail.toLowerCase() === userEmail.toLowerCase() && s.status === 'pending'
   );
 };
 
 export const getUserLatestSubmission = (userEmail: string): PaymentSubmission | undefined => {
+  if (!userEmail) return undefined;
   const all = getAllPaymentSubmissions();
   const userSubmissions = all.filter(
-    (s) => s.userEmail.toLowerCase() === userEmail.toLowerCase()
+    (s) => s.userEmail && s.userEmail.toLowerCase() === userEmail.toLowerCase()
   );
   if (userSubmissions.length === 0) return undefined;
   return userSubmissions.sort((a, b) => b.createdAt - a.createdAt)[0];
@@ -74,6 +77,7 @@ export const submitPaymentProof = (params: {
   const all = getAllPaymentSubmissions();
   all.unshift(newSubmission);
   savePaymentSubmissions(all);
+  savePaymentSubmissionToFirestore(newSubmission);
 
   return {
     success: true,
@@ -101,13 +105,14 @@ export const approvePaymentSubmission = (
   sub.processedAt = Date.now();
   submissions[index] = sub;
   savePaymentSubmissions(submissions);
+  savePaymentSubmissionToFirestore(sub);
 
-  // Update target user in localStorage
+  // Update target user in localStorage and Firestore
   try {
     const storedUsersStr = localStorage.getItem('naira9ja_users');
     const usersMap: Record<string, User> = storedUsersStr ? JSON.parse(storedUsersStr) : {};
-    const targetEmailKey = sub.userEmail.toLowerCase();
-    const targetUser = usersMap[targetEmailKey];
+    const targetEmailKey = sub.userEmail ? sub.userEmail.toLowerCase() : '';
+    const targetUser = targetEmailKey ? usersMap[targetEmailKey] : undefined;
 
     if (targetUser) {
       let message = `Your payment of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was APPROVED by Service!`;
@@ -143,6 +148,7 @@ export const approvePaymentSubmission = (
       targetUser.adminMessage = message;
       usersMap[targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+      saveUserToFirestore(targetUser);
 
       if (onUserUpdateCallback) {
         onUserUpdateCallback(targetUser);
@@ -178,18 +184,20 @@ export const declinePaymentSubmission = (
   sub.processedAt = Date.now();
   submissions[index] = sub;
   savePaymentSubmissions(submissions);
+  savePaymentSubmissionToFirestore(sub);
 
-  // Update target user with decline notification
+  // Update target user with decline notification in localStorage and Firestore
   try {
     const storedUsersStr = localStorage.getItem('naira9ja_users');
     const usersMap: Record<string, User> = storedUsersStr ? JSON.parse(storedUsersStr) : {};
-    const targetEmailKey = sub.userEmail.toLowerCase();
-    const targetUser = usersMap[targetEmailKey];
+    const targetEmailKey = sub.userEmail ? sub.userEmail.toLowerCase() : '';
+    const targetUser = targetEmailKey ? usersMap[targetEmailKey] : undefined;
 
     if (targetUser) {
       targetUser.adminMessage = `Your payment submission of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was DECLINED by Service.\nReason: ${reason}`;
       usersMap[targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+      saveUserToFirestore(targetUser);
 
       if (onUserUpdateCallback) {
         onUserUpdateCallback(targetUser);

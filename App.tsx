@@ -31,6 +31,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { Suspended } from './components/Suspended';
 import { Icons } from './components/Icons';
 import { User, Transaction, RewardStatus, UpgradeLevelPlan } from './types';
+import { saveUserToFirestore, subscribeToUsers } from './firestoreService';
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
@@ -102,12 +103,33 @@ const App: React.FC = () => {
     return null;
   });
 
-  // Helper to save user to local storage
+  // Helper to save user to local storage and Firestore
   const saveUserToStorage = (u: User) => {
     const existingUsers = getStoredUsers();
     existingUsers[u.email.toLowerCase()] = u;
     localStorage.setItem('naira9ja_users', JSON.stringify(existingUsers));
+    saveUserToFirestore(u);
   };
+
+  // Real-time Firestore sync for active user
+  useEffect(() => {
+    if (!user?.email) return;
+    const unsub = subscribeToUsers((firestoreUsers) => {
+      const activeKey = user.email.toLowerCase();
+      const updatedUser = firestoreUsers[activeKey];
+      if (updatedUser) {
+        setUser((prev) => {
+          if (!prev) return updatedUser;
+          // Only update state if Firestore object differs
+          if (JSON.stringify(prev) !== JSON.stringify(updatedUser)) {
+            return updatedUser;
+          }
+          return prev;
+        });
+      }
+    });
+    return () => unsub();
+  }, [user?.email]);
 
   // Check Loan Expiry and Auto-Debit
   useEffect(() => {

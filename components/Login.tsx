@@ -32,10 +32,11 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
     setTimeout(() => {
       const existingUsersStr = localStorage.getItem('naira9ja_users');
       const existingUsers = existingUsersStr ? JSON.parse(existingUsersStr) : {};
-      const user = existingUsers[email.toLowerCase()];
+      const safeEmail = (email || '').trim().toLowerCase();
+      const user = existingUsers[safeEmail];
 
       if (user) {
-        onLogin(email, user.name);
+        onLogin(safeEmail, user.name);
         setIsLoading(false);
       } else {
         setError('Account not registered on this device.');

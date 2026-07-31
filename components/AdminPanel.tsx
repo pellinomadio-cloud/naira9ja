@@ -7,6 +7,13 @@ import {
   approvePaymentSubmission, 
   declinePaymentSubmission 
 } from '../paymentService';
+import {
+  saveUserToFirestore,
+  saveAppSettingsToFirestore,
+  subscribeToUsers,
+  subscribeToPaymentSubmissions,
+  subscribeToAppSettings
+} from '../firestoreService';
 
 interface AdminPanelProps {
   currentUser: User;
@@ -35,7 +42,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // All registered users state
   const [allUsers, setAllUsers] = useState<Record<string, User>>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedUserEmail, setSelectedUserEmail] = useState<string>(currentUser.email.toLowerCase());
+  const [selectedUserEmail, setSelectedUserEmail] = useState<string>(currentUser?.email ? currentUser.email.toLowerCase() : '');
 
   // Selected User Fields
   const [editBalance, setEditBalance] = useState<string>('0');
@@ -67,7 +74,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       const parsedUsers: Record<string, User> = stored ? JSON.parse(stored) : {};
       
       // Ensure currentUser is present
-      if (currentUser && !parsedUsers[currentUser.email.toLowerCase()]) {
+      if (currentUser && currentUser.email && !parsedUsers[currentUser.email.toLowerCase()]) {
         parsedUsers[currentUser.email.toLowerCase()] = currentUser;
       }
 
@@ -80,6 +87,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   useEffect(() => {
     loadUsersFromStorage();
     loadSubmissions();
+
+    // Subscribe to Firestore real-time data
+    const unsubUsers = subscribeToUsers((firestoreUsers) => {
+      setAllUsers((prev) => ({ ...prev, ...firestoreUsers }));
+    });
+
+    const unsubPayments = subscribeToPaymentSubmissions((firestorePayments) => {
+      setPaymentSubmissions(firestorePayments);
+    });
+
+    const unsubSettings = subscribeToAppSettings((firestoreSettings) => {
+      setAppSettings(firestoreSettings);
+    });
+
+    return () => {
+      unsubUsers();
+      unsubPayments();
+      unsubSettings();
+    };
   }, []);
 
   // Sync selected user form when selectedUserEmail or allUsers changes
@@ -116,8 +142,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Filter users by search
   const userList: User[] = (Object.values(allUsers) as User[]).filter(
     (u: User) =>
-      u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (u?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (u?.email || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const pendingCount = paymentSubmissions.filter(s => s.status === 'pending').length;
@@ -131,7 +157,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const res = approvePaymentSubmission(submissionId, (updatedTargetUser) => {
       // Update local storage state
       loadUsersFromStorage();
-      if (updatedTargetUser.email.toLowerCase() === currentUser.email.toLowerCase()) {
+      if (updatedTargetUser?.email && currentUser?.email && updatedTargetUser.email.toLowerCase() === currentUser.email.toLowerCase()) {
         onUpdateCurrentUser(updatedTargetUser);
       }
     });
@@ -150,7 +176,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const reason = declineReasonInput[submissionId] || 'Invalid payment receipt or unconfirmed bank transfer.';
     const res = declinePaymentSubmission(submissionId, reason, (updatedTargetUser) => {
       loadUsersFromStorage();
-      if (updatedTargetUser.email.toLowerCase() === currentUser.email.toLowerCase()) {
+      if (updatedTargetUser?.email && currentUser?.email && updatedTargetUser.email.toLowerCase() === currentUser.email.toLowerCase()) {
         onUpdateCurrentUser(updatedTargetUser);
       }
     });
@@ -192,7 +218,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       imminentDeactivationExpiry: imminentExpiry
     };
 
-    // Save to allUsers map
+    // Save to allUsers map and Firestore
     const updatedMap = {
       ...allUsers,
       [selectedUserEmail]: updatedTargetUser
@@ -200,19 +226,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
     setAllUsers(updatedMap);
     localStorage.setItem('naira9ja_users', JSON.stringify(updatedMap));
+    saveUserToFirestore(updatedTargetUser);
 
     // If target user is the currently active user, trigger callback
-    if (selectedUserEmail === currentUser.email.toLowerCase()) {
+    if (selectedUserEmail && currentUser?.email && selectedUserEmail === currentUser.email.toLowerCase()) {
       onUpdateCurrentUser(updatedTargetUser);
     }
 
-    setNotice({ type: 'success', message: `User ${updatedTargetUser.name} updated successfully!` });
+    setNotice({ type: 'success', message: `User ${updatedTargetUser.name} updated successfully in Firebase & Local Storage!` });
     setTimeout(() => setNotice(null), 3500);
   };
 
   const handleSaveSettings = () => {
     saveAppSettings(appSettings);
-    setNotice({ type: 'success', message: 'Global App Settings updated successfully!' });
+    saveAppSettingsToFirestore(appSettings);
+    setNotice({ type: 'success', message: 'Global App Settings updated in Firebase & Local Storage!' });
     setTimeout(() => setNotice(null), 3500);
   };
 
@@ -618,11 +646,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <p className="text-xs text-slate-500 text-center py-4 italic">No matching users found.</p>
               ) : (
                 userList.map((u) => {
-                  const isSelected = u.email.toLowerCase() === selectedUserEmail;
+                  const isSelected = u.email ? u.email.toLowerCase() === selectedUserEmail : false;
                   return (
                     <div
-                      key={u.email}
-                      onClick={() => setSelectedUserEmail(u.email.toLowerCase())}
+                      key={u.email || Math.random().toString()}
+                      onClick={() => u.email && setSelectedUserEmail(u.email.toLowerCase())}
                       className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
                         isSelected
                           ? 'bg-gradient-to-r from-red-950/80 to-[#1b1e48] border-red-500 text-white shadow-md'
@@ -1020,8 +1048,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         const updatedMap = { ...allUsers, [selectedUserEmail]: targetUser };
                         setAllUsers(updatedMap);
                         localStorage.setItem('naira9ja_users', JSON.stringify(updatedMap));
+                        saveUserToFirestore(targetUser);
 
-                        if (selectedUserEmail === currentUser.email.toLowerCase()) {
+                        if (selectedUserEmail && currentUser?.email && selectedUserEmail === currentUser.email.toLowerCase()) {
                           onUpdateCurrentUser(targetUser);
                         }
 

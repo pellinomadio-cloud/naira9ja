@@ -109,7 +109,7 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
         // Mark code as used in user's state and localStorage
         try {
           const storedUsersStr = localStorage.getItem('naira9ja_users');
-          if (storedUsersStr) {
+          if (storedUsersStr && user?.email) {
             const usersMap: Record<string, User> = JSON.parse(storedUsersStr);
             const userKey = user.email.toLowerCase();
             if (usersMap[userKey]) {
