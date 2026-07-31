@@ -4,7 +4,7 @@ import App from './App';
 import { Suspended } from './components/Suspended';
 
 // Administrative Override: Set to true to suspend and block the entire site, false to restore
-const isSuspended = true;
+const isSuspended = false;
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
