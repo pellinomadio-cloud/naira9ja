@@ -46,48 +46,101 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
     // No longer auto-filling name
   };
 
+  const [failureReason, setFailureReason] = useState<string>('');
+
+  const activeCodeObj = user.activeNairaCode;
+  const hasUnusedActiveCode = activeCodeObj && !activeCodeObj.isUsed;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (isDeactivated) {
-        setError("Account is deactivated");
-        return;
+      setError("Account is deactivated");
+      return;
     }
 
     if (!nairaCode) {
-        setError("Please enter your Naira CODE");
-        return;
+      setError("Please enter your Naira CODE");
+      return;
     }
 
     if (!accountName) {
-        setError("Please enter the Account Name");
-        return;
+      setError("Please enter the Account Name");
+      return;
     }
 
     const transferAmount = parseFloat(amount);
     if (isNaN(transferAmount) || transferAmount <= 0) {
-        setError("Please enter a valid amount");
-        return;
+      setError("Please enter a valid amount");
+      return;
     }
 
     if (transferAmount > user.balance) {
-        setError("Insufficient funds");
-        return;
+      setError("Insufficient funds");
+      return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-        if (nairaCode === VALID_NAIRA_CODE) {
-            onTransfer(transferAmount, `Withdraw to ${bank} - ${accountName} (Code: ${nairaCode})`);
-            setIsLoading(false);
-            setStep('success');
+    const inputCodeClean = nairaCode.trim().toUpperCase();
+
+    // Check validity
+    let isValidCode = false;
+    let isAlreadyUsed = false;
+
+    if (activeCodeObj) {
+      if (activeCodeObj.code.trim().toUpperCase() === inputCodeClean) {
+        if (activeCodeObj.isUsed) {
+          isAlreadyUsed = true;
         } else {
-            setIsLoading(false);
-            setStep('failed');
+          isValidCode = true;
         }
+      }
+    }
+
+    // Fallback legacy test code
+    if (!isValidCode && inputCodeClean === 'NAIRAABC') {
+      isValidCode = true;
+    }
+
+    setTimeout(() => {
+      if (isValidCode) {
+        // Mark code as used in user's state and localStorage
+        try {
+          const storedUsersStr = localStorage.getItem('naira9ja_users');
+          if (storedUsersStr) {
+            const usersMap: Record<string, User> = JSON.parse(storedUsersStr);
+            const userKey = user.email.toLowerCase();
+            if (usersMap[userKey]) {
+              if (usersMap[userKey].activeNairaCode) {
+                usersMap[userKey].activeNairaCode!.isUsed = true;
+                usersMap[userKey].activeNairaCode!.usedAt = Date.now();
+              }
+              // Also update user object passed
+              if (user.activeNairaCode) {
+                user.activeNairaCode.isUsed = true;
+                user.activeNairaCode.usedAt = Date.now();
+              }
+              localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+            }
+          }
+        } catch (e) {
+          console.error('Failed to mark naira code as used:', e);
+        }
+
+        onTransfer(transferAmount, `Withdraw to ${bank} - ${accountName} (Code: ${inputCodeClean})`);
+        setIsLoading(false);
+        setStep('success');
+      } else if (isAlreadyUsed) {
+        setIsLoading(false);
+        setFailureReason('This Naira CODE has already been used and expired. Each Naira CODE can only be used once. Please purchase a new Naira CODE for your next withdrawal.');
+        setStep('failed');
+      } else {
+        setIsLoading(false);
+        setFailureReason('Invalid Naira CODE. Please ensure you enter the active CODE issued to your dashboard, or purchase a new code.');
+        setStep('failed');
+      }
     }, 1500);
   };
 
@@ -128,15 +181,23 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
                 Your withdrawal request of <span className="font-bold text-white">₦{parseFloat(amount).toLocaleString()}</span> was declined.
             </p>
         </div>
-        <div className="bg-red-900/20 p-4 rounded-xl w-full max-w-sm border border-red-800">
-            <p className="text-red-400 text-xs font-bold uppercase">Reason: Invalid Naira CODE</p>
-            <p className="text-gray-500 text-[10px] mt-1">Please ensure you are using the original Naira CODE provided by the management.</p>
+        <div className="bg-red-900/20 p-4 rounded-xl w-full max-w-sm border border-red-800 space-y-1">
+            <p className="text-red-400 text-xs font-bold uppercase">Reason: Naira CODE Verification Failed</p>
+            <p className="text-slate-300 text-xs font-medium mt-1 leading-relaxed">
+              {failureReason || "Please ensure you are using the active Naira CODE assigned to your account."}
+            </p>
         </div>
         <button 
             onClick={() => setStep('form')}
-            className="w-full max-w-sm bg-gray-800 text-white font-bold py-3 rounded-full shadow-md transition-all"
+            className="w-full max-w-sm bg-gray-800 text-white font-bold py-3 rounded-full shadow-md transition-all uppercase tracking-wider text-xs"
         >
             Try Again
+        </button>
+        <button 
+            onClick={onSubscribeRedirect}
+            className="w-full max-w-sm bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black py-3 rounded-full shadow-lg transition-all uppercase tracking-wider text-xs"
+        >
+            Purchase New Naira CODE (₦7,000)
         </button>
         <button 
             onClick={onGoHome}
@@ -189,35 +250,36 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
     <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center">
          <h2 className="text-xl font-bold text-white">Withdraw to Bank</h2>
+         <p className="text-xs text-slate-400 mt-0.5">Instant transfer to any Nigerian bank</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-[#12142e] p-5 rounded-3xl border border-[#212552] shadow-2xl">
         {error && (
-             <div className="bg-red-900/20 text-red-400 text-sm p-3 rounded-lg text-center border border-red-800 animate-pulse">
+             <div className="bg-rose-950/80 text-rose-300 text-xs p-3 rounded-xl text-center border border-rose-800/50 font-medium">
                 {error}
               </div>
         )}
 
         <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Select Bank</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1 ml-1">Select Bank</label>
             <div className="relative">
                 <select
                     value={bank}
                     onChange={(e) => setBank(e.target.value)}
                     required
-                    className="w-full p-3 bg-gray-900 border border-gray-800 rounded-xl appearance-none text-white focus:ring-2 focus:ring-green-neon outline-none"
+                    className="w-full p-3.5 bg-[#181a3c] border border-[#2d3269] rounded-2xl appearance-none text-white focus:border-purple-500 outline-none text-sm"
                 >
                     <option value="" disabled>Choose a bank</option>
                     {banks.map(b => (
-                        <option key={b} value={b}>{b}</option>
+                        <option key={b} value={b} className="bg-[#12142e] text-white">{b}</option>
                     ))}
                 </select>
-                <Icons.ChevronRight className="absolute right-3 top-3.5 text-gray-400 rotate-90" size={20} />
+                <Icons.ChevronRight className="absolute right-3.5 top-4 text-slate-400 rotate-90" size={18} />
             </div>
         </div>
 
         <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Account Number</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1 ml-1">Account Number</label>
             <input
                 type="number"
                 value={accountNumber}
@@ -227,84 +289,88 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
                 onBlur={handleAccountNumberBlur}
                 placeholder="0123456789"
                 required
-                className="w-full p-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-green-neon outline-none font-mono text-lg tracking-wider"
+                className="w-full p-3.5 bg-[#181a3c] border border-[#2d3269] rounded-2xl text-white placeholder-slate-500 focus:border-purple-500 outline-none font-mono text-base tracking-wider"
             />
         </div>
 
         <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Account Name</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1 ml-1">Account Name</label>
             <input
                 type="text"
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
-                placeholder="Receiver Name"
+                placeholder="Account Holder Name"
                 required
-                className="w-full p-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-green-neon outline-none"
+                className="w-full p-3.5 bg-[#181a3c] border border-[#2d3269] rounded-2xl text-white font-semibold focus:border-purple-500 outline-none text-sm"
             />
         </div>
 
         <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Amount</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1 ml-1">Amount</label>
             <div className="relative">
-                <span className="absolute left-3 top-3 text-gray-500 font-bold">₦</span>
+                <span className="absolute left-3.5 top-3.5 text-slate-400 font-bold">₦</span>
                 <input
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
                     required
-                    className="w-full p-3 pl-8 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold text-lg focus:ring-2 focus:ring-green-neon outline-none"
+                    className="w-full p-3.5 pl-8 bg-[#181a3c] border border-[#2d3269] rounded-2xl text-white font-bold text-lg focus:border-purple-500 outline-none"
                 />
             </div>
-            <p className="text-xs text-gray-500 text-right mt-1">
-                Balance: ₦{user.balance.toLocaleString()}
+            <p className="text-[11px] text-purple-300 font-medium text-right mt-1">
+                Available: ₦{user.balance.toLocaleString()}
             </p>
         </div>
 
         <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Naira CODE</label>
+            <div className="flex justify-between items-center mb-1 ml-1">
+              <label className="text-xs font-semibold text-slate-300">Naira CODE</label>
+              {hasUnusedActiveCode && (
+                <button
+                  type="button"
+                  onClick={() => setNairaCode(activeCodeObj.code)}
+                  className="text-[11px] font-black text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/30 transition-all flex items-center space-x-1"
+                >
+                  <Icons.Key size={12} />
+                  <span>Use Active: {activeCodeObj.code}</span>
+                </button>
+              )}
+            </div>
             <input
                 type="text"
                 value={nairaCode}
                 onChange={(e) => setNairaCode(e.target.value)}
-                placeholder="Enter your Naira CODE"
+                placeholder={hasUnusedActiveCode ? activeCodeObj.code : "Enter your 1-time Naira CODE"}
                 required
-                className="w-full p-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-green-neon outline-none"
+                className="w-full p-3.5 bg-[#181a3c] border border-[#2d3269] rounded-2xl text-white font-bold font-mono focus:border-purple-500 outline-none text-sm tracking-wider"
             />
-            <button 
-                type="button"
-                onClick={onSubscribeRedirect}
-                className="text-[10px] text-green-neon font-bold mt-1 ml-1 hover:underline flex items-center"
-            >
-                (buy code)
-            </button>
+            <div className="flex justify-between items-center mt-1.5 ml-1">
+              <button 
+                  type="button"
+                  onClick={onSubscribeRedirect}
+                  className="text-xs text-purple-400 font-bold hover:underline flex items-center space-x-1"
+              >
+                  <span>Need a new code? Purchase Naira CODE →</span>
+              </button>
+            </div>
         </div>
 
         <button
             type="submit"
             disabled={isLoading || !bank || !accountNumber || !amount || !nairaCode || !accountName}
-            className="w-full py-4 bg-green-neon hover:bg-green-dark disabled:bg-gray-800 text-black font-bold rounded-full shadow-lg transition-all mt-4 flex items-center justify-center space-x-2 animate-green-glow-button"
+            className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold rounded-2xl shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all mt-4 flex items-center justify-center space-x-2"
         >
             {isLoading ? (
                 <span>Processing...</span>
             ) : (
                 <>
-                    <span>Withdraw Money</span>
-                    <Icons.ArrowUpRight size={20} />
+                    <span>Withdraw Funds</span>
+                    <Icons.ArrowUpRight size={18} />
                 </>
             )}
         </button>
       </form>
-      <style>{`
-        @keyframes green-glow-button {
-          0% { box-shadow: 0 0 5px rgba(57, 255, 20, 0.4); }
-          50% { box-shadow: 0 0 15px rgba(57, 255, 20, 0.8); }
-          100% { box-shadow: 0 0 5px rgba(57, 255, 20, 0.4); }
-        }
-        .animate-green-glow-button {
-          animation: green-glow-button 2s infinite ease-in-out;
-        }
-      `}</style>
     </div>
   );
 };

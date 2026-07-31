@@ -1,17 +1,36 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
+import { getAppSettings } from '../appSettings';
+import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
 
 interface BuyNairaCodeProps {
+  userEmail?: string;
+  userName?: string;
   onBack: () => void;
 }
 
-const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'details' | 'submitting' | 'pending' | 'failed'>('idle');
+const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 'User', onBack }) => {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'details' | 'submitting' | 'pending_exist' | 'success'>('idle');
   const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofDataUrl, setProofDataUrl] = useState<string | undefined>(undefined);
   const [copied, setCopied] = useState(false);
+  const [noticeMessage, setNoticeMessage] = useState<string>('');
 
-  const accountNumber = "5276179936";
+  const settings = getAppSettings();
+  const accountNumber = settings.companyAccountNumber;
+
+  const activeEmail = userEmail || (() => {
+    try {
+      const stored = localStorage.getItem('naira9ja_users');
+      if (stored) {
+        const users = JSON.parse(stored);
+        const emails = Object.keys(users);
+        if (emails.length > 0) return emails[0];
+      }
+    } catch (e) {}
+    return 'user@naira9ja.com';
+  })();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(accountNumber);
@@ -21,21 +40,66 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
 
   useEffect(() => {
     setStatus('loading');
+
+    const pending = getUserPendingSubmission(activeEmail);
     const timer = setTimeout(() => {
-      setStatus('details');
-    }, 3000);
+      if (pending) {
+        setStatus('pending_exist');
+      } else {
+        setStatus('details');
+      }
+    }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [activeEmail]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setProofFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProofDataUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setProofDataUrl(undefined);
+    }
+  };
 
   const handleConfirm = () => {
+    const pending = getUserPendingSubmission(activeEmail);
+    if (pending) {
+      setStatus('pending_exist');
+      alert('You already have a payment submission pending admin approval.');
+      return;
+    }
+
     if (!proofFile) {
       alert("Please upload payment proof first.");
       return;
     }
     setStatus('submitting');
+
     setTimeout(() => {
-      setStatus('failed');
-    }, 2000);
+      const result = submitPaymentProof({
+        userEmail: activeEmail,
+        userName,
+        type: 'naira_code',
+        amount: 7000,
+        itemDescription: 'Naira CODE Voucher Activation (₦7,000)',
+        proofFileName: proofFile.name,
+        proofDataUrl: proofDataUrl,
+        codeAmount: 7000
+      });
+
+      if (result.success) {
+        setStatus('success');
+        setNoticeMessage(result.message);
+      } else {
+        setStatus('pending_exist');
+        setNoticeMessage(result.message);
+      }
+    }, 1500);
   };
 
   if (status === 'loading') {
@@ -47,64 +111,24 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
     );
   }
 
-  if (status === 'failed') {
-    return (
-      <div className="px-4 py-10 flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-300">
-        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-4 relative">
-          <div className="absolute inset-0 rounded-full border-4 border-red-500 opacity-20 animate-ping"></div>
-          <Icons.X size={48} className="text-red-500" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-black mb-2 uppercase tracking-tighter">Verification Failed</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Your payment proof could not be verified. Please ensure you made the transfer to the correct account and uploaded a valid receipt.
-          </p>
-        </div>
-        <button 
-          onClick={() => setStatus('details')}
-          className="w-full max-w-sm bg-black text-white font-black py-4 rounded-xl shadow-xl transition-all transform active:scale-95 uppercase tracking-widest"
-        >
-          Try Again
-        </button>
-        <button 
-          onClick={onBack}
-          className="text-gray-400 text-xs hover:text-black transition-colors"
-        >
-          Back to Dashboard
-        </button>
-      </div>
-    );
-  }
-
-  if (status === 'pending') {
-    return (
-      <div className="px-4 py-10 flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-300">
-        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4 relative">
-          <div className="absolute inset-0 rounded-full border-4 border-black opacity-20 animate-ping"></div>
-          <Icons.Check size={48} className="text-black" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-black mb-2 uppercase tracking-tighter">Verification Pending</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Your payment proof has been submitted successfully. Our admin team will verify it within 24 hours.
-          </p>
-        </div>
-        <button 
-          onClick={onBack}
-          className="w-full max-w-sm bg-black text-white font-black py-4 rounded-xl shadow-xl transition-all transform active:scale-95 uppercase tracking-widest"
-        >
-          Back to Dashboard
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       <div className="text-center">
          <h2 className="text-xl font-bold text-black uppercase tracking-tighter">Buy Naira CODE</h2>
          <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Follow the steps below to get your code</p>
       </div>
+
+      {status === 'pending_exist' && (
+        <div className="bg-amber-950/90 border border-amber-600/80 p-5 rounded-3xl space-y-2 text-center animate-in zoom-in-95 text-amber-200">
+          <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto border border-amber-500/40">
+            <Icons.Sync className="animate-spin" size={24} />
+          </div>
+          <h4 className="font-black text-amber-300 text-base">CODE Verification Pending</h4>
+          <p className="text-xs text-amber-200/90 leading-relaxed font-medium">
+            You already submitted a Naira CODE payment proof to Service. Your request is awaiting admin review and approval. You cannot upload a new payment proof until the current submission is processed.
+          </p>
+        </div>
+      )}
 
       {/* Selected Plan Summary */}
       <div className="bg-white p-4 rounded-xl flex justify-between items-center border border-gray-100 shadow-sm">
@@ -140,18 +164,18 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
             </div>
             <div className="flex justify-between items-center border-b border-gray-50 pb-2">
               <span className="text-xs text-gray-400 uppercase font-bold">Bank Name</span>
-              <span className="text-lg font-black text-black uppercase tracking-tighter">Moniepoint MFB</span>
+              <span className="text-lg font-black text-black uppercase tracking-tighter">{settings.companyBankName}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-400 uppercase font-bold">Account Name</span>
-              <span className="text-sm font-black text-black uppercase tracking-tighter">Awwal Onimsi Abdulsalam</span>
+              <span className="text-sm font-black text-black uppercase tracking-tighter">{settings.companyAccountName}</span>
             </div>
           </div>
           
           <div className="bg-gray-50 p-3 rounded-lg flex items-start space-x-2">
             <Icons.AlertTriangle size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
             <p className="text-[10px] text-gray-400 leading-tight font-medium uppercase">
-              Ensure you pay exactly ₦7,000 for Naira CODE. Verification is manual.
+              Ensure you pay exactly ₦7,000 for Naira CODE. Verification is manual by Service Admin.
             </p>
           </div>
         </div>
@@ -165,14 +189,17 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
           <input 
             type="file" 
             accept="image/*"
-            onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+            disabled={status === 'pending_exist'}
+            onChange={handleFileChange}
             className="hidden" 
             id="proof-upload"
           />
           <label 
             htmlFor="proof-upload"
             className={`w-full py-6 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all ${
-              proofFile ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white hover:border-black'
+              status === 'pending_exist'
+                ? 'border-gray-200 bg-gray-100/60 opacity-60 cursor-not-allowed'
+                : proofFile ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white hover:border-black'
             }`}
           >
             {proofFile ? (
@@ -190,20 +217,41 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ onBack }) => {
         </div>
       </div>
 
+      {status === 'success' && (
+        <div className="bg-emerald-900 text-white p-4 rounded-xl text-center space-y-1 animate-in fade-in">
+          <div className="flex items-center justify-center space-x-2">
+            <Icons.CheckCircle size={22} className="text-emerald-400" />
+            <span className="text-xs font-extrabold uppercase">Payment Proof Submitted!</span>
+          </div>
+          <p className="text-[11px] text-emerald-200">{noticeMessage}</p>
+        </div>
+      )}
+
       {/* Confirm Button */}
       <div className="space-y-3">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 text-center">Step 3: Confirm Payment</p>
         <button 
             onClick={handleConfirm}
-            disabled={status === 'submitting'}
+            disabled={status === 'submitting' || status === 'success' || status === 'pending_exist'}
             className={`w-full py-4 rounded-xl text-white font-black text-lg shadow-lg transition-all flex items-center justify-center space-x-2 ${
-                status === 'submitting'
-                ? 'bg-gray-300 cursor-not-allowed'
+                status === 'submitting' || status === 'success' || status === 'pending_exist'
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-black hover:bg-gray-800 transform active:scale-95'
             }`}
         >
-            {status === 'submitting' ? <Icons.Sync className="animate-spin" size={20} /> : <Icons.ShieldCheck size={20} />}
-            <span className="uppercase tracking-widest">{status === 'submitting' ? 'Submitting...' : 'Confirm Payment'}</span>
+            {status === 'submitting' ? (
+              <>
+                <Icons.Sync className="animate-spin" size={20} />
+                <span className="uppercase tracking-widest">Submitting Proof...</span>
+              </>
+            ) : status === 'pending_exist' ? (
+              <span className="uppercase tracking-widest text-xs">Submission Pending Approval</span>
+            ) : (
+              <>
+                <Icons.ShieldCheck size={20} />
+                <span className="uppercase tracking-widest">Confirm Payment</span>
+              </>
+            )}
         </button>
       </div>
 

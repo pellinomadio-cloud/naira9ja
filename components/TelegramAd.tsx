@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Icons } from './Icons';
+import { getAppSettings } from '../appSettings';
 
 interface TelegramAdProps {
   onJoin: () => void;
@@ -8,6 +9,8 @@ interface TelegramAdProps {
 }
 
 const TelegramAd: React.FC<TelegramAdProps> = ({ onJoin, onContinue }) => {
+  const settings = getAppSettings();
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative overflow-hidden text-center space-y-6 animate-in zoom-in-95 duration-300 border border-gray-200">
@@ -19,7 +22,7 @@ const TelegramAd: React.FC<TelegramAdProps> = ({ onJoin, onContinue }) => {
              <p className="text-gray-500 mt-2 text-sm leading-relaxed">
                 Stay updated! Join our official Telegram channel for exclusive rewards, updates, and support.
              </p>
-             <p className="text-black font-bold mt-1">@naira9ja001</p>
+             <p className="text-black font-bold mt-1">{settings.telegramLink}</p>
         </div>
 
         <div className="space-y-3">

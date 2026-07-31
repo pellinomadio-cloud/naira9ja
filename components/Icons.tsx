@@ -3,6 +3,8 @@ import React from 'react';
 import { 
   Headset, 
   Bell, 
+  Settings,
+  UserCheck,
   Landmark, 
   User, 
   PiggyBank, 
@@ -36,6 +38,7 @@ import {
   Calendar, 
   Clock, 
   CheckCircle,
+  XCircle,
   Upload,
   AlertTriangle,
   Copy,
@@ -52,13 +55,26 @@ import {
   Ban,
   Zap,
   Radio,
-  Scan
+  Scan,
+  GraduationCap,
+  Menu,
+  TrendingUp,
+  BarChart2,
+  ArrowDown,
+  ArrowUp,
+  ClipboardList,
+  HelpCircle,
+  CheckCircle2,
+  Key
 } from 'lucide-react';
 
 // Exporting icons for easy import elsewhere
 export const Icons = {
   Support: Headset,
   Notification: Bell,
+  Bell,
+  Settings,
+  UserCheck,
   Bank: Landmark,
   User: User,
   Savings: PiggyBank,
@@ -73,6 +89,7 @@ export const Icons = {
   ShieldCheck,
   Upgrade: Zap,
   Loan: Wallet,
+  Wallet,
   More: MoreHorizontal,
   Home,
   LoanTab: Banknote,
@@ -97,6 +114,7 @@ export const Icons = {
   Subscribe: Calendar,
   Clock,
   CheckCircle,
+  XCircle,
   Upload,
   AlertTriangle,
   Copy,
@@ -114,5 +132,16 @@ export const Icons = {
   Ban,
   Zap,
   Radio,
-  Scan
+  Scan,
+  GraduationCap,
+  Menu,
+  TrendingUp,
+  BarChart2,
+  ArrowDown,
+  ArrowUp,
+  ClipboardList,
+  HelpCircle,
+  CheckCircle2,
+  Key
 };
+

@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "User account information, balance, and active Naira CODEs",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "balance": { "type": "number" },
+        "accountType": { "type": "string" },
+        "isPMode": { "type": "boolean" },
+        "activeNairaCode": { "type": "object" },
+        "nairaCodesHistory": { "type": "array" },
+        "transactions": { "type": "array" }
+      },
+      "required": ["email", "name", "balance"]
+    },
+    "payment_submissions": {
+      "title": "Payment Submission",
+      "description": "Proof of payment for account activation, upgrade, or Naira CODE purchase",
+      "properties": {
+        "id": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "type": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "userEmail", "type", "amount", "status"]
+    }
+  }
+}

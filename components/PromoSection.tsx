@@ -3,22 +3,21 @@ import { Icons } from './Icons';
 
 const PromoSection: React.FC = () => {
   return (
-    <div className="space-y-4">
-      {/* Secondary Promo Row (Optional but adds to the aesthetic) */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 mb-3">
+    <div className="space-y-4 my-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-[#12142e] rounded-2xl p-4 border border-[#212552] shadow-xl hover:border-purple-500/30 transition-all">
+          <div className="w-9 h-9 bg-purple-950/80 rounded-xl flex items-center justify-center text-purple-400 mb-2.5 border border-purple-800/40">
             <Icons.Savings size={20} />
           </div>
-          <h4 className="text-xs font-bold text-gray-800">Fixed Savings</h4>
-          <p className="text-[10px] text-gray-400 mt-1">Earn up to 20% p.a.</p>
+          <h4 className="text-xs font-bold text-white">Smart Vault</h4>
+          <p className="text-[10px] text-slate-400 mt-0.5">Earn up to 25% p.a.</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-green-500 mb-3">
+        <div className="bg-[#12142e] rounded-2xl p-4 border border-[#212552] shadow-xl hover:border-indigo-500/30 transition-all">
+          <div className="w-9 h-9 bg-emerald-950/80 rounded-xl flex items-center justify-center text-emerald-400 mb-2.5 border border-emerald-800/40">
             <Icons.Zap size={20} />
           </div>
-          <h4 className="text-xs font-bold text-gray-800">SmartEarn</h4>
-          <p className="text-[10px] text-gray-400 mt-1">Daily returns on cash</p>
+          <h4 className="text-xs font-bold text-white">Learn & Grow</h4>
+          <p className="text-[10px] text-slate-400 mt-0.5">Daily course payouts</p>
         </div>
       </div>
     </div>

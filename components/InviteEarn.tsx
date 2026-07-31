@@ -53,7 +53,7 @@ const InviteEarn: React.FC<InviteEarnProps> = ({ onReward, onBack }) => {
     setIsLoading(true);
 
     // Construct WhatsApp share link with updated URL
-    const text = encodeURIComponent("Join naira9ja today and get ₦10,000 welcome bonus! Join here: https://naira9ja.top");
+    const text = encodeURIComponent("Join naira9ja today and get ₦250,000 welcome bonus! Join here: https://naira9ja.top");
     const url = `https://wa.me/?text=${text}`;
     
     // Open WhatsApp

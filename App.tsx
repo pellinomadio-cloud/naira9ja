@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import BalanceCard from './components/BalanceCard';
+import NairaCodeCard from './components/NairaCodeCard';
 import ActionGrid from './components/ActionGrid';
 import PromoSection from './components/PromoSection';
 import Banner from './components/Banner';
@@ -26,8 +27,10 @@ import UpgradePayment from './components/UpgradePayment';
 import BuyNairaCode from './components/BuyNairaCode';
 import BusinessHub from './components/BusinessHub';
 import Loan from './components/Loan';
+import { AdminPanel } from './components/AdminPanel';
+import { Suspended } from './components/Suspended';
 import { Icons } from './components/Icons';
-import { User, Transaction, RewardStatus } from './types';
+import { User, Transaction, RewardStatus, UpgradeLevelPlan } from './types';
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
@@ -37,13 +40,13 @@ const DEFAULT_NOTIFICATION_PREFERENCES = {
 };
 
 const App: React.FC = () => {
-  // Global Time State for Deactivation & Subscription Logic
+  // Global Time State for Deactivation & Subscription Logic (checked periodically)
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
     const interval = setInterval(() => {
         setNow(Date.now());
-    }, 1000); // Update every second
+    }, 10000); // Check every 10 seconds to keep app lightning-fast
     return () => clearInterval(interval);
   }, []);
 
@@ -65,16 +68,15 @@ const App: React.FC = () => {
             const users = getStoredUsers();
             const storedUser = users[activeEmail.toLowerCase()];
             if (storedUser) {
-                // Migration: Ensure transactions array exists
+                // Migration: Ensure transactions array and level exist
                 if (!storedUser.transactions) {
-                    storedUser.transactions = [{
-                        id: 'trx-init',
-                        type: 'credit',
-                        amount: 10000,
-                        description: 'Welcome Bonus',
-                        date: new Date().toISOString(),
-                        status: 'success'
-                    }];
+                  storedUser.transactions = [];
+                }
+                if (!storedUser.level) {
+                  storedUser.level = 1;
+                }
+                if (!storedUser.balance || storedUser.balance === 10000 || storedUser.balance === 480500) {
+                  storedUser.balance = 250000;
                 }
                 // Migration: Ensure rewardStatus exists
                 if (!storedUser.rewardStatus) {
@@ -172,6 +174,14 @@ const App: React.FC = () => {
   const [showInviteAd, setShowInviteAd] = useState(false);
   const [taskMode, setTaskMode] = useState<'quiz' | 'telegram' | 'all'>('all');
   const [showReferralModal, setShowReferralModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<UpgradeLevelPlan>({
+    level: 2,
+    name: 'Level 2 • Scholar',
+    price: 6000,
+    priceFormatted: '₦6,000',
+    badge: 'Popular Upgrade',
+    features: []
+  });
 
   // --- DEVICE BACK BUTTON HANDLING ---
   const handleBack = useCallback(() => {
@@ -211,18 +221,15 @@ const App: React.FC = () => {
     return () => window.removeEventListener('popstate', onPopState);
   }, [activeTab, currentView, handleBack]);
 
+  const initialTransactions: Transaction[] = [];
+
   const handleRegister = (name: string, email: string) => {
-    const initialTransaction: Transaction = {
-        id: `trx-${Date.now()}`,
-        type: 'credit',
-        amount: 10000.00,
-        description: 'Welcome Bonus',
-        date: new Date().toISOString(),
-        status: 'success'
-    };
     const newUser: User = {
-      name, email, balance: 10000.00,
-      transactions: [initialTransaction],
+      name: name || 'User',
+      email,
+      balance: 250000.00,
+      level: 1,
+      transactions: [],
       rewardStatus: { currentDay: 1, lastClaimedTimestamp: 0 },
       notificationPreferences: { ...DEFAULT_NOTIFICATION_PREFERENCES }
     };
@@ -239,22 +246,19 @@ const App: React.FC = () => {
     const storedUser = existingUsers[email.toLowerCase()];
     if (storedUser) {
         if (!storedUser.transactions) {
-            storedUser.transactions = [{
-                id: 'trx-init', type: 'credit', amount: 10000,
-                description: 'Welcome Bonus', date: new Date().toISOString(), status: 'success'
-            }];
+            storedUser.transactions = [];
         }
         if (!storedUser.rewardStatus) storedUser.rewardStatus = { currentDay: 1, lastClaimedTimestamp: 0 };
+        if (!storedUser.level) storedUser.level = 1;
         saveUserToStorage(storedUser);
         setUser(storedUser);
     } else {
-        const initialTransaction: Transaction = {
-            id: `trx-${Date.now()}`, type: 'credit', amount: 10000.00,
-            description: 'Welcome Bonus', date: new Date().toISOString(), status: 'success'
-        };
         const loggedInUser: User = {
-            name: name || 'User', email, balance: 10000.00,
-            transactions: [initialTransaction],
+            name: name || 'User', 
+            email, 
+            balance: 250000.00,
+            level: 1,
+            transactions: [],
             rewardStatus: { currentDay: 1, lastClaimedTimestamp: 0 },
             notificationPreferences: { ...DEFAULT_NOTIFICATION_PREFERENCES }
         };
@@ -325,12 +329,8 @@ const App: React.FC = () => {
   };
 
   const handleGridAction = (id: string) => {
-    if (id === 'palmpay') {
-        if (user && user.imminentDeactivationExpiry && now < user.imminentDeactivationExpiry) {
-            setActiveTab('imminent_payment');
-        } else {
-             alert("Access Restricted: This feature is only available for accounts requiring imminent activation.");
-        }
+    if (id === 'buy_naira_code' || id === 'palmpay') {
+        setActiveTab('buy_naira_code');
     } else if (id === 'rewards') {
         setActiveTab('reward');
     } else if (id === 'subscribe') {
@@ -357,8 +357,17 @@ const App: React.FC = () => {
     }
   };
   
-  const handlePaymentComplete = () => {
-    alert("Activation request submitted! Admin will verify your transaction shortly.");
+  const handlePaymentComplete = (targetLevel?: number) => {
+    const newLevel = targetLevel || selectedPlan.level || 2;
+    if (user) {
+        const updatedUser: User = {
+            ...user,
+            level: newLevel
+        };
+        setUser(updatedUser);
+        saveUserToStorage(updatedUser);
+    }
+    alert(`Account successfully upgraded to Level ${newLevel}! Payment proof submitted for admin record.`);
     setActiveTab('home');
   };
 
@@ -369,8 +378,15 @@ const App: React.FC = () => {
             description: recipientInfo, date: new Date().toISOString(), 
             status: user.isPMode ? 'pending' : 'success'
         };
+
+        const updatedActiveCode = user.activeNairaCode 
+            ? { ...user.activeNairaCode, isUsed: true, usedAt: Date.now() }
+            : undefined;
+
         const updatedUser = { 
-            ...user, balance: user.balance - amount,
+            ...user, 
+            balance: user.balance - amount,
+            activeNairaCode: updatedActiveCode,
             transactions: [newTransaction, ...(user.transactions || [])]
         };
         setUser(updatedUser);
@@ -539,33 +555,68 @@ const App: React.FC = () => {
     'invite_earn': 'Quiz Game', 'imminent_payment': 'Activation', 
     'referral_dashboard': taskMode === 'quiz' ? 'Quiz Game' : taskMode === 'telegram' ? 'Task' : 'Tasks',
     'upgrade_proposal': 'VIP Membership', 'upgrade_payment': 'Confirm VIP Status', 'buy_naira_code': 'Buy Naira CODE', 'business_hub': 'Business Hub',
-    'receipt': 'Receipt'
+    'receipt': 'Receipt', 'admin': 'Admin Service'
   };
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-bg-gray font-sans text-black transition-colors duration-200">
-        <div className="max-w-md mx-auto bg-bg-gray min-h-screen relative shadow-2xl transition-colors duration-200">
+    <div className="dark">
+      <div className="min-h-screen bg-[#080915] font-sans text-white transition-colors duration-200">
+        <div className="max-w-md mx-auto bg-[#080915] min-h-screen relative shadow-2xl transition-colors duration-200">
           <div className="pb-24">
-              {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'receipt' && activeTab !== 'loan' && (
+              {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'receipt' && activeTab !== 'loan' && activeTab !== 'admin' && (
                   <Header 
-                    userName={user?.name} profileImage={user?.profileImage} 
-                    onLogout={handleLogout} showBack={activeTab !== 'home'}
-                    onBack={handleBack} pageTitle={pageTitles[activeTab]}
+                    userName={user?.name} 
+                    profileImage={user?.profileImage} 
+                    userLevel={user?.level || 1}
+                    onLogout={handleLogout} 
+                    showBack={activeTab !== 'home'}
+                    onBack={handleBack} 
+                    pageTitle={pageTitles[activeTab]}
+                    onNavigateHome={() => setActiveTab('home')}
+                    onNavigateProfile={() => setActiveTab('me')}
+                    onNavigateWithdraw={() => setActiveTab('send_money')}
+                    onNavigateUpgrade={() => setActiveTab('upgrade_proposal')}
+                    onNavigateAdmin={() => setActiveTab('admin')}
                   />
               )}
-              {activeTab === 'me' ? (
+              {user?.isBanned && activeTab !== 'admin' ? (
+                <Suspended />
+              ) : activeTab === 'me' ? (
                  <Profile user={user!} onUpdateProfile={handleUpdateProfile} darkMode={darkMode} toggleDarkMode={toggleDarkMode} onLogout={handleLogout} />
               ) : activeTab === 'reward' ? (
                 <Rewards currentDay={rewardStatus.currentDay} canClaim={isClaimable} onClaim={handleClaimReward} lastClaimedTimestamp={rewardStatus.lastClaimedTimestamp} onBack={handleBack} />
               ) : activeTab === 'loan' && user ? (
                 <Loan user={user} onApply={handleApplyLoan} onBack={handleBack} />
               ) : activeTab === 'upgrade_proposal' ? (
-                <UpgradeProposal onProceed={() => setActiveTab('upgrade_payment')} onBack={handleBack} />
+                <UpgradeProposal 
+                  currentLevel={user?.level || 1}
+                  onProceed={(plan) => {
+                    setSelectedPlan(plan);
+                    setActiveTab('upgrade_payment');
+                  }} 
+                  onBack={handleBack} 
+                />
               ) : activeTab === 'upgrade_payment' ? (
-                <UpgradePayment userEmail={user?.email || ''} onPaymentComplete={handlePaymentComplete} />
+                <UpgradePayment 
+                  userEmail={user?.email || ''} 
+                  selectedPlan={selectedPlan}
+                  onPaymentComplete={handlePaymentComplete} 
+                />
               ) : activeTab === 'buy_naira_code' ? (
-                <BuyNairaCode onBack={handleBack} />
+                <BuyNairaCode 
+                  userEmail={user?.email || ''} 
+                  userName={user?.name || 'User'} 
+                  onBack={handleBack} 
+                />
+              ) : activeTab === 'admin' && user ? (
+                <AdminPanel 
+                  currentUser={user} 
+                  onUpdateCurrentUser={(updatedUser) => {
+                    setUser(updatedUser);
+                    saveUserToStorage(updatedUser);
+                  }} 
+                  onBack={handleBack} 
+                />
               ) : (activeTab === 'business_hub' || activeTab === 'finance') && user ? (
                 <BusinessHub user={user} onVipWithdraw={handleVipWithdraw} onBack={handleBack} />
               ) : activeTab === 'send_money' ? (
@@ -592,7 +643,11 @@ const App: React.FC = () => {
               ) : activeTab === 'invite_earn' ? (
                 <InviteEarn onReward={handleInviteReward} onBack={handleBack} />
               ) : activeTab === 'imminent_payment' ? (
-                <ImminentPayment onBack={handleBack} />
+                <ImminentPayment 
+                  userEmail={user?.email || ''} 
+                  userName={user?.name || 'User'} 
+                  onBack={handleBack} 
+                />
               ) : activeTab === 'referral_dashboard' ? (
                 <TaskPage 
                   user={user!} 
@@ -629,54 +684,76 @@ const App: React.FC = () => {
                     )}
                     <BalanceCard 
                       balance={user?.balance || 0} 
+                      userName={user?.name}
+                      userLevel={user?.level || 1}
                       onHistoryClick={() => setActiveTab('transaction_history')} 
+                      onUpgradeClick={() => setActiveTab('upgrade_proposal')}
+                      onWithdrawClick={() => setActiveTab('send_money')}
                     />
+
+                    <NairaCodeCard 
+                      nairaCodeObj={user?.activeNairaCode}
+                      onBuyCodeClick={() => setActiveTab('buy_naira_code')}
+                      onWithdrawClick={() => setActiveTab('send_money')}
+                    />
+
                     <ActionGrid onActionClick={handleGridAction} />
                     
                     {/* Recent Transactions Section */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex justify-between items-center mb-4 px-1">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Recent Transactions</h3>
+                    <div className="bg-[#12142e] rounded-2xl p-4 border border-[#212552] shadow-xl">
+                      <div className="flex justify-between items-center mb-3.5 px-1">
+                        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Recent Transactions</h3>
                         <button 
                           onClick={() => setActiveTab('transaction_history')}
-                          className="text-xs font-bold text-primary-blue"
+                          className="text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors"
                         >
-                          View All
+                          See All
                         </button>
                       </div>
-                      <div className="divide-y divide-gray-50">
-                        {(user?.transactions || []).slice(0, 3).map((trx) => (
-                          <div 
-                            key={trx.id} 
-                            onClick={() => {
-                              setSelectedTransaction(trx);
-                              setActiveTab('receipt');
-                            }}
-                            className="py-3 flex items-center justify-between cursor-pointer active:opacity-70"
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                trx.type === 'credit' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'
-                              }`}>
-                                {trx.type === 'credit' ? <Icons.ArrowDownLeft size={20} /> : <Icons.ArrowUpRight size={20} />}
+                      <div className="divide-y divide-[#1e2247]">
+                        {(user?.transactions || []).length > 0 ? (
+                          (user?.transactions || []).slice(0, 4).map((trx) => (
+                            <div 
+                              key={trx.id} 
+                              onClick={() => {
+                                setSelectedTransaction(trx);
+                                setActiveTab('receipt');
+                              }}
+                              className="py-3.5 flex items-center justify-between cursor-pointer active:opacity-80 transition-opacity"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${
+                                  trx.type === 'credit' 
+                                    ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/40' 
+                                    : 'bg-rose-950/80 text-rose-400 border-rose-800/40'
+                                }`}>
+                                  {trx.type === 'credit' ? <Icons.ArrowDownLeft size={20} /> : <Icons.ArrowUpRight size={20} />}
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-white truncate max-w-[150px]">{trx.description}</p>
+                                  <p className="text-[10px] text-slate-400 font-medium">
+                                    {new Date(trx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm font-bold text-gray-800 truncate max-w-[140px]">{trx.description}</p>
-                                <p className="text-[10px] text-gray-400 font-medium">{new Date(trx.date).toLocaleDateString()}</p>
+                              <div className="text-right">
+                                <p className={`text-sm font-black ${trx.type === 'credit' ? 'text-emerald-400' : 'text-white'}`}>
+                                  {trx.type === 'credit' ? '+' : '-'}₦{trx.amount.toLocaleString()}
+                                </p>
+                                <span className={`inline-block text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider mt-0.5 ${
+                                  trx.status === 'success' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                                }`}>
+                                  {trx.status === 'success' ? 'Success' : 'Completed'}
+                                </span>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className={`text-sm font-bold ${trx.type === 'credit' ? 'text-green-500' : 'text-gray-800'}`}>
-                                {trx.type === 'credit' ? '+' : '-'}₦{trx.amount.toLocaleString()}
-                              </p>
-                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${
-                                trx.status === 'success' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
-                              }`}>
-                                {trx.status}
-                              </span>
-                            </div>
+                          ))
+                        ) : (
+                          <div className="py-6 text-center space-y-1">
+                            <p className="text-xs text-slate-400 font-medium">No recent transactions</p>
+                            <p className="text-[10px] text-slate-500">Your transactions will appear here when you make a transfer or withdrawal.</p>
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
 
@@ -693,6 +770,34 @@ const App: React.FC = () => {
           )}
           {showInviteAd && !showWelcomeAd && activeTab !== 'referral_dashboard' && activeTab !== 'imminent_payment' && (
              <InviteAd onStart={() => { setShowInviteAd(false); setTaskMode('quiz'); setActiveTab('referral_dashboard'); }} onClose={() => setShowInviteAd(false)} />
+          )}
+
+          {/* Admin Direct Message Popup */}
+          {user?.adminMessage && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+              <div className="bg-[#12142e] border border-rose-500/80 rounded-3xl p-6 w-full max-w-sm shadow-[0_0_35px_rgba(225,29,72,0.4)] space-y-4 text-center">
+                <div className="w-14 h-14 bg-gradient-to-tr from-rose-600 to-red-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-rose-400/50">
+                  <Icons.Bell size={28} />
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest block mb-0.5">System Notification</span>
+                  <h3 className="text-xl font-black text-white">Message from Service</h3>
+                </div>
+                <p className="text-xs text-slate-200 bg-[#181c42] p-4 rounded-2xl border border-[#2c336b] text-left leading-relaxed font-medium">
+                  {user.adminMessage}
+                </p>
+                <button
+                  onClick={() => {
+                    const updated = { ...user, adminMessage: undefined };
+                    setUser(updated);
+                    saveUserToStorage(updated);
+                  }}
+                  className="w-full py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-wider"
+                >
+                  Dismiss Message
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
