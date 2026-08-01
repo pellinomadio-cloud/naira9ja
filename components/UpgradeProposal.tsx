@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { UpgradeLevelPlan } from '../types';
-import { getAppSettings } from '../appSettings';
+import { getAppSettings, useAppSettings } from '../appSettings';
+import { AppSettings } from '../types';
 
 interface UpgradeProposalProps {
   currentLevel?: number;
@@ -10,8 +11,8 @@ interface UpgradeProposalProps {
   onBack: () => void;
 }
 
-export const getUpgradePlans = (): UpgradeLevelPlan[] => {
-  const settings = getAppSettings();
+export const getUpgradePlans = (passedSettings?: AppSettings): UpgradeLevelPlan[] => {
+  const settings = passedSettings || getAppSettings();
   return [
     {
       level: 2,
@@ -56,11 +57,12 @@ export const getUpgradePlans = (): UpgradeLevelPlan[] => {
 };
 
 const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ currentLevel = 1, onProceed, onBack }) => {
+  const settings = useAppSettings();
   const [selectedLevel, setSelectedLevel] = useState<number>(
     currentLevel >= 4 ? 4 : currentLevel + 1 <= 4 ? currentLevel + 1 : 2
   );
 
-  const upgradePlans = getUpgradePlans();
+  const upgradePlans = getUpgradePlans(settings);
   const activePlan = upgradePlans.find(p => p.level === selectedLevel) || upgradePlans[0];
 
   return (

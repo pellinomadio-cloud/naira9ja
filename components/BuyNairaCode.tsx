@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
 
 interface BuyNairaCodeProps {
@@ -17,7 +17,7 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
   const [copied, setCopied] = useState(false);
   const [noticeMessage, setNoticeMessage] = useState<string>('');
 
-  const settings = getAppSettings();
+  const settings = useAppSettings();
   const accountNumber = settings.companyAccountNumber;
 
   const activeEmail = userEmail || (() => {

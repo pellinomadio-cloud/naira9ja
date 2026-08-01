@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { Icons } from './Icons';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 
 interface ActionGridProps {
   onActionClick?: (id: string) => void;
 }
 
 export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
+  const settings = useAppSettings();
   const primaryQuickAccess = [
     {
       id: 'upgrade',
@@ -63,7 +64,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
                 key={item.id}
                 onClick={() => {
                   if (item.id === 'support') {
-                    const settings = getAppSettings();
                     const link = settings.supportLink || settings.telegramLink || 'https://t.me/naira9ja_support';
                     window.open(link, '_blank');
                   } else {

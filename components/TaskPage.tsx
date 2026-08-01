@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { User } from '../types';
 import { quizQuestions, QuizQuestion } from './quizQuestions';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 
 interface TaskPageProps {
   user: User;
@@ -14,6 +14,7 @@ interface TaskPageProps {
 }
 
 const TaskPage: React.FC<TaskPageProps> = ({ user, onTelegramClaim, onGameResult, onBack, mode = 'all' }) => {
+  const settings = useAppSettings();
   const [gameStep, setGameStep] = useState<'intro' | 'playing' | 'result'>('intro');
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -101,7 +102,6 @@ const TaskPage: React.FC<TaskPageProps> = ({ user, onTelegramClaim, onGameResult
         <div className="space-y-3 pt-2">
             <button 
                 onClick={() => {
-                    const settings = getAppSettings();
                     window.open(settings.telegramLink || 'https://t.me/naira9ja001', '_blank');
                     onTelegramClaim();
                 }}

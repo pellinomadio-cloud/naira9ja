@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { AppSettings, DEFAULT_APP_SETTINGS } from './types';
+import { subscribeToAppSettings } from './firestoreService';
 
 export const getAppSettings = (): AppSettings => {
   try {
@@ -16,7 +18,36 @@ export const getAppSettings = (): AppSettings => {
 export const saveAppSettings = (settings: AppSettings): void => {
   try {
     localStorage.setItem('naira9ja_app_settings', JSON.stringify(settings));
+    window.dispatchEvent(new Event('naira9ja_app_settings_updated'));
   } catch (e) {
     console.error('Failed to save app settings:', e);
   }
 };
+
+export const useAppSettings = (): AppSettings => {
+  const [settings, setSettings] = useState<AppSettings>(getAppSettings());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setSettings(getAppSettings());
+    };
+
+    window.addEventListener('naira9ja_app_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    const unsub = subscribeToAppSettings((firestoreSettings) => {
+      if (firestoreSettings) {
+        setSettings({ ...DEFAULT_APP_SETTINGS, ...firestoreSettings });
+      }
+    });
+
+    return () => {
+      window.removeEventListener('naira9ja_app_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+      if (unsub) unsub();
+    };
+  }, []);
+
+  return settings;
+};
+

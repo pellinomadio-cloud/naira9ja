@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Icons } from './Icons';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 
 interface TelegramAdProps {
   onJoin: () => void;
@@ -9,7 +9,7 @@ interface TelegramAdProps {
 }
 
 const TelegramAd: React.FC<TelegramAdProps> = ({ onJoin, onContinue }) => {
-  const settings = getAppSettings();
+  const settings = useAppSettings();
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { UpgradeLevelPlan } from '../types';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
 
 interface UpgradePaymentProps {
@@ -32,7 +32,7 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
   const [copied, setCopied] = useState(false);
   const [noticeMessage, setNoticeMessage] = useState<string>('');
 
-  const settings = getAppSettings();
+  const settings = useAppSettings();
   const accountNumber = settings.companyAccountNumber;
 
   const handleCopy = () => {

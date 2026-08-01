@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
-import { getAppSettings } from '../appSettings';
+import { useAppSettings } from '../appSettings';
 import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
 
 interface ImminentPaymentProps {
@@ -16,7 +16,7 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [noticeMessage, setNoticeMessage] = useState<string>('');
 
-  const settings = getAppSettings();
+  const settings = useAppSettings();
 
   // If email not passed, try getting current logged in user from localStorage
   const activeEmail = userEmail || (() => {
