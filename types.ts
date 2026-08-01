@@ -68,6 +68,7 @@ export interface User {
   isPMode?: boolean;
   isVMode?: boolean; // Verification mode
   isBanned?: boolean; // Banned status
+  attendedByAdmin?: boolean; // Flagged when admin attends to user
   adminMessage?: string; // Message sent from admin
   notificationPreferences?: NotificationPreferences;
   lastTelegramClaimTimestamp?: number;

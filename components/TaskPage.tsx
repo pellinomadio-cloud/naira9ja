@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { User } from '../types';
 import { quizQuestions, QuizQuestion } from './quizQuestions';
+import { getAppSettings } from '../appSettings';
 
 interface TaskPageProps {
   user: User;
@@ -100,7 +101,8 @@ const TaskPage: React.FC<TaskPageProps> = ({ user, onTelegramClaim, onGameResult
         <div className="space-y-3 pt-2">
             <button 
                 onClick={() => {
-                    window.open('https://t.me/naira9ja001', '_blank');
+                    const settings = getAppSettings();
+                    window.open(settings.telegramLink || 'https://t.me/naira9ja001', '_blank');
                     onTelegramClaim();
                 }}
                 disabled={!canClaimTelegram()}

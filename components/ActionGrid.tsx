@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Icons } from './Icons';
+import { getAppSettings } from '../appSettings';
 
 interface ActionGridProps {
   onActionClick?: (id: string) => void;
@@ -62,7 +63,9 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
                 key={item.id}
                 onClick={() => {
                   if (item.id === 'support') {
-                    window.open('https://t.me/naira9ja001', '_blank');
+                    const settings = getAppSettings();
+                    const link = settings.supportLink || settings.telegramLink || 'https://t.me/naira9ja_support';
+                    window.open(link, '_blank');
                   } else {
                     onActionClick?.(item.id);
                   }

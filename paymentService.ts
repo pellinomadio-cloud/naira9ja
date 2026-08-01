@@ -145,6 +145,7 @@ export const approvePaymentSubmission = (
         message += ` Your Naira CODE (${issuedCode}) has been approved and is now active on your dashboard for withdrawal!`;
       }
 
+      targetUser.attendedByAdmin = true;
       targetUser.adminMessage = message;
       usersMap[targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
@@ -194,6 +195,7 @@ export const declinePaymentSubmission = (
     const targetUser = targetEmailKey ? usersMap[targetEmailKey] : undefined;
 
     if (targetUser) {
+      targetUser.attendedByAdmin = true;
       targetUser.adminMessage = `Your payment submission of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was DECLINED by Service.\nReason: ${reason}`;
       usersMap[targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));

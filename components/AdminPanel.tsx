@@ -139,12 +139,56 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  // Filter users by search
-  const userList: User[] = (Object.values(allUsers) as User[]).filter(
-    (u: User) =>
-      (u?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u?.email || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Build set of attended user emails
+  const attendedUserEmails = new Set<string>();
+
+  // Always include admin's own email if available
+  if (currentUser?.email) {
+    attendedUserEmails.add(currentUser.email.toLowerCase());
+  }
+
+  // Include any user flagged as attendedByAdmin
+  (Object.values(allUsers) as User[]).forEach((u) => {
+    if (u && u.email && u.attendedByAdmin) {
+      attendedUserEmails.add(u.email.toLowerCase());
+    }
+  });
+
+  // Include users who have payment submissions (approved or declined, or uploaded)
+  paymentSubmissions.forEach((s) => {
+    if (s && s.userEmail && s.status !== 'pending') {
+      attendedUserEmails.add(s.userEmail.toLowerCase());
+    }
+  });
+
+  // Filter users by attended list (plus search query)
+  const userList: User[] = (Object.values(allUsers) as User[]).filter((u: User) => {
+    if (!u || !u.email) return false;
+    const emailKey = u.email.toLowerCase();
+    const isAttended = attendedUserEmails.has(emailKey);
+
+    const matchesSearch =
+      (u.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    return isAttended && matchesSearch;
+  });
+
+  const handleMarkUserAttended = (email: string) => {
+    if (!email) return;
+    const key = email.toLowerCase();
+    const userToAttend = allUsers[key];
+    if (userToAttend) {
+      const updatedUser: User = { ...userToAttend, attendedByAdmin: true };
+      const updatedMap = { ...allUsers, [key]: updatedUser };
+      setAllUsers(updatedMap);
+      localStorage.setItem('naira9ja_users', JSON.stringify(updatedMap));
+      saveUserToFirestore(updatedUser);
+      setSelectedUserEmail(key);
+      setNotice({ type: 'success', message: `User ${userToAttend.name} has been saved to Admin Dashboard!` });
+      setTimeout(() => setNotice(null), 3000);
+    }
+  };
 
   const pendingCount = paymentSubmissions.filter(s => s.status === 'pending').length;
 
@@ -575,6 +619,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <span>Decline Payment</span>
                         </button>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleMarkUserAttended(sub.userEmail);
+                          setAdminTab('users');
+                        }}
+                        className="w-full py-2 bg-indigo-950/80 hover:bg-indigo-900/90 border border-indigo-700/60 text-indigo-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 active:scale-95"
+                      >
+                        <Icons.UserCheck size={15} />
+                        <span>Attend User & Manage on Dashboard</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {sub.status !== 'pending' && (
+                    <div className="pt-2 flex justify-between items-center">
+                      <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center space-x-1">
+                        <Icons.CheckCircle size={12} />
+                        <span>User Attended & Saved on Dashboard</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleMarkUserAttended(sub.userEmail);
+                          setAdminTab('users');
+                        }}
+                        className="px-2.5 py-1 bg-[#181c42] hover:bg-red-900/40 text-xs font-bold text-slate-200 border border-[#2b326d] rounded-lg"
+                      >
+                        Edit User / Ban
+                      </button>
                     </div>
                   )}
 
@@ -638,12 +713,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           {/* User Selector Dropdown List */}
           <div className="bg-[#12142e] rounded-3xl p-4 border border-[#212552] space-y-3">
             <span className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider block">
-              Select User to Manage ({userList.length} found)
+              Attended Users Saved on Admin Dashboard ({userList.length})
             </span>
 
             <div className="max-h-52 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
               {userList.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4 italic">No matching users found.</p>
+                <div className="text-center py-6 px-3 space-y-1">
+                  <p className="text-xs text-slate-400 font-bold">No attended users saved on dashboard yet.</p>
+                  <p className="text-[10px] text-slate-500 max-w-xs mx-auto leading-relaxed">
+                    When a user uploads a payment for activation or service and you attend to them, their information is saved here so you can ban their account or edit their balance.
+                  </p>
+                </div>
               ) : (
                 userList.map((u) => {
                   const isSelected = u.email ? u.email.toLowerCase() === selectedUserEmail : false;

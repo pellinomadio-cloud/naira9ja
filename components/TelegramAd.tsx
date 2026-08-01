@@ -27,7 +27,10 @@ const TelegramAd: React.FC<TelegramAdProps> = ({ onJoin, onContinue }) => {
 
         <div className="space-y-3">
             <button 
-                onClick={onJoin}
+                onClick={() => {
+                  window.open(settings.telegramLink || 'https://t.me/naira9ja001', '_blank');
+                  onJoin();
+                }}
                 className="w-full py-3.5 bg-black hover:bg-gray-800 text-white font-bold rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center space-x-2"
             >
                 <Icons.Send size={18} />
