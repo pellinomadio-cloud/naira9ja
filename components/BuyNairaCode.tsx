@@ -19,6 +19,8 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
 
   const settings = useAppSettings();
   const accountNumber = settings.companyAccountNumber;
+  const nairaCodePrice = settings.nairaCodePrice ?? 7000;
+  const nairaCodePriceFormatted = `₦${nairaCodePrice.toLocaleString()}`;
 
   const activeEmail = userEmail || (() => {
     try {
@@ -85,11 +87,11 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
         userEmail: activeEmail,
         userName,
         type: 'naira_code',
-        amount: 7000,
-        itemDescription: 'Naira CODE Voucher Activation (₦7,000)',
+        amount: nairaCodePrice,
+        itemDescription: `Naira CODE Voucher Activation (${nairaCodePriceFormatted})`,
         proofFileName: proofFile.name,
         proofDataUrl: proofDataUrl,
-        codeAmount: 7000
+        codeAmount: nairaCodePrice
       });
 
       if (result.success) {
@@ -137,7 +139,7 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
             <h3 className="text-lg font-bold text-black">Naira CODE Activation</h3>
         </div>
         <div className="text-right">
-            <p className="text-lg font-extrabold text-black">₦7,000</p>
+            <p className="text-lg font-extrabold text-black">{nairaCodePriceFormatted}</p>
             <p className="text-xs text-gray-400 uppercase">One-time</p>
         </div>
       </div>
@@ -175,7 +177,7 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
           <div className="bg-gray-50 p-3 rounded-lg flex items-start space-x-2">
             <Icons.AlertTriangle size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
             <p className="text-[10px] text-gray-400 leading-tight font-medium uppercase">
-              Ensure you pay exactly ₦7,000 for Naira CODE. Verification is manual by Service Admin.
+              Ensure you pay exactly {nairaCodePriceFormatted} for Naira CODE. Verification is manual by Service Admin.
             </p>
           </div>
         </div>

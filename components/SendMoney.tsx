@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { User } from '../types';
+import { useAppSettings } from '../appSettings';
 
 interface SendMoneyProps {
   user: User;
@@ -27,6 +28,8 @@ const banks = [
 ];
 
 const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedirect, onGoHome }) => {
+  const settings = useAppSettings();
+  const nairaCodePrice = settings.nairaCodePrice ?? 7000;
   const [step, setStep] = useState<'form' | 'success' | 'failed'>('form');
   const [bank, setBank] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -197,7 +200,7 @@ const SendMoney: React.FC<SendMoneyProps> = ({ user, onTransfer, onSubscribeRedi
             onClick={onSubscribeRedirect}
             className="w-full max-w-sm bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black py-3 rounded-full shadow-lg transition-all uppercase tracking-wider text-xs"
         >
-            Purchase New Naira CODE (₦7,000)
+            Purchase New Naira CODE (₦{nairaCodePrice.toLocaleString()})
         </button>
         <button 
             onClick={onGoHome}

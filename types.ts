@@ -86,6 +86,7 @@ export interface AppSettings {
   level3Price: number;
   level4Price: number;
   nairaCodePrices: number[];
+  nairaCodePrice: number;
   telegramLink: string;
   supportLink: string;
 }
@@ -98,6 +99,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   level3Price: 8000,
   level4Price: 15000,
   nairaCodePrices: [6000, 8000, 10000, 15000],
+  nairaCodePrice: 7000,
   telegramLink: 'https://t.me/naira9ja001',
   supportLink: 'https://t.me/naira9ja_support'
 };

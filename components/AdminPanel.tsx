@@ -965,7 +965,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
           {/* Prices Section */}
           <div className="space-y-3 pt-3 border-t border-[#1e2247]">
-            <h4 className="text-xs font-black text-purple-400 uppercase tracking-widest flex items-center space-x-1">
+            <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest flex items-center space-x-1">
+              <Icons.Key size={14} />
+              <span>Naira CODE Activation Price (₦)</span>
+            </h4>
+
+            <div>
+              <label className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider block mb-1">
+                Naira CODE Amount (₦)
+              </label>
+              <input
+                type="number"
+                value={appSettings.nairaCodePrice ?? 7000}
+                onChange={(e) =>
+                  setAppSettings({ ...appSettings, nairaCodePrice: parseFloat(e.target.value) || 0 })
+                }
+                className="w-full px-4 py-2.5 bg-[#181c42] border border-[#2b3164] rounded-xl text-amber-300 font-mono text-xs font-bold"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                Amount required for users to purchase/activate a Naira CODE across the application.
+              </p>
+            </div>
+
+            <h4 className="text-xs font-black text-purple-400 uppercase tracking-widest flex items-center space-x-1 pt-2">
               <Icons.TrendingUp size={14} />
               <span>Level Upgrade Prices (₦)</span>
             </h4>

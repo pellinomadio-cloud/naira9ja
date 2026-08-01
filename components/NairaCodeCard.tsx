@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { NairaCodeData } from '../types';
+import { useAppSettings } from '../appSettings';
 
 interface NairaCodeCardProps {
   nairaCodeObj?: NairaCodeData;
@@ -13,6 +14,8 @@ const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
   onBuyCodeClick,
   onWithdrawClick
 }) => {
+  const settings = useAppSettings();
+  const nairaCodePrice = settings.nairaCodePrice ?? 7000;
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (code: string) => {
@@ -132,7 +135,7 @@ const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
         onClick={onBuyCodeClick}
         className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95 uppercase tracking-wider"
       >
-        Get CODE (₦7,000)
+        Get CODE (₦{nairaCodePrice.toLocaleString()})
       </button>
     </div>
   );
