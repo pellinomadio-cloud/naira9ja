@@ -241,6 +241,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const pendingActivationSubmissions = paymentSubmissions.filter(
     (s) =>
       s.status === 'pending' &&
+      s.type !== 'naira_code' &&
+      !(s.itemDescription && s.itemDescription.toLowerCase().includes('naira code')) &&
       (s.type === 'activation' || (s.itemDescription && s.itemDescription.toLowerCase().includes('activation')))
   );
   const pendingActivationCount = pendingActivationSubmissions.length;
@@ -249,11 +251,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     if (paymentFilter !== 'all' && s.status !== paymentFilter) return false;
 
     if (paymentTypeFilter !== 'all') {
+      const isNairaCode = s.type === 'naira_code' || (s.itemDescription && s.itemDescription.toLowerCase().includes('naira code'));
       const isActivation =
-        s.type === 'activation' || (s.itemDescription && s.itemDescription.toLowerCase().includes('activation'));
+        !isNairaCode &&
+        (s.type === 'activation' || (s.itemDescription && s.itemDescription.toLowerCase().includes('activation')));
       if (paymentTypeFilter === 'activation' && !isActivation) return false;
       if (paymentTypeFilter === 'upgrade' && s.type !== 'upgrade') return false;
-      if (paymentTypeFilter === 'naira_code' && s.type !== 'naira_code') return false;
+      if (paymentTypeFilter === 'naira_code' && !isNairaCode) return false;
     }
 
     if (paymentSearchQuery.trim()) {
@@ -604,9 +608,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="flex flex-wrap gap-2">
             {[
               { id: 'all', label: 'All Categories' },
-              { id: 'activation', label: `⚡ Activations (${paymentSubmissions.filter(s => s.type === 'activation' || s.itemDescription?.toLowerCase().includes('activation')).length})` },
+              { id: 'activation', label: `⚡ Activations (${paymentSubmissions.filter(s => s.type !== 'naira_code' && !s.itemDescription?.toLowerCase().includes('naira code') && (s.type === 'activation' || s.itemDescription?.toLowerCase().includes('activation'))).length})` },
               { id: 'upgrade', label: `Upgrades (${paymentSubmissions.filter(s => s.type === 'upgrade').length})` },
-              { id: 'naira_code', label: `Naira Codes (${paymentSubmissions.filter(s => s.type === 'naira_code').length})` }
+              { id: 'naira_code', label: `Naira Codes (${paymentSubmissions.filter(s => s.type === 'naira_code' || s.itemDescription?.toLowerCase().includes('naira code')).length})` }
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -669,7 +673,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
             ) : (
               filteredSubmissions.map((sub) => {
-                const isActivation = sub.type === 'activation' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('activation'));
+                const isNairaCode = sub.type === 'naira_code' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('naira code'));
+                const isActivation = !isNairaCode && (sub.type === 'activation' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('activation')));
 
                 return (
                   <div
@@ -678,6 +683,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       sub.status === 'pending'
                         ? isActivation
                           ? 'border-amber-500/80 bg-gradient-to-b from-[#231b10] to-[#12142e] shadow-amber-950/20'
+                          : isNairaCode
+                          ? 'border-emerald-500/80 bg-gradient-to-b from-[#11241a] to-[#12142e] shadow-emerald-950/20'
                           : 'border-amber-500/50 bg-gradient-to-b from-[#161a3f] to-[#12142e]'
                         : sub.status === 'approved'
                         ? 'border-emerald-800/40 opacity-90'
@@ -698,6 +705,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           }`}>
                             {sub.status}
                           </span>
+                          {isNairaCode && (
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-950/80 text-emerald-300 border border-emerald-600/60 flex items-center space-x-1">
+                              <span>🔑 NAIRA CODE VOUCHER</span>
+                            </span>
+                          )}
                           {isActivation && (
                             <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-950/80 text-purple-300 border border-purple-600/60 flex items-center space-x-1">
                               <span>⚡ ACCOUNT ACTIVATION</span>
@@ -799,7 +811,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             className="py-3 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-950/40 transition-all active:scale-95 uppercase tracking-wider flex items-center justify-center space-x-2 border border-emerald-400/30"
                           >
                             <Icons.CheckCircle size={17} />
-                            <span>{isActivation ? 'Approve & Activate User' : 'Approve & Grant'}</span>
+                            <span>{isNairaCode ? 'Approve & Issue Naira Code' : isActivation ? 'Approve & Activate User' : 'Approve & Grant'}</span>
                           </button>
 
                           <button

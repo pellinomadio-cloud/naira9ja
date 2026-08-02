@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Icons } from './Icons';
 import { User } from '../types';
+import { compressImageFile } from '../utils/imageCompressor';
 
 interface ProfileProps {
   user: User;
@@ -15,14 +16,15 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, darkMode, togg
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onUpdateProfile({ profileImage: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file, 300, 0.8);
+        onUpdateProfile({ profileImage: compressed });
+      } catch (err) {
+        console.error('Failed to compress avatar:', err);
+      }
     }
   };
 

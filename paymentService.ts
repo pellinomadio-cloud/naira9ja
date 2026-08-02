@@ -17,7 +17,30 @@ export const savePaymentSubmissions = (submissions: PaymentSubmission[]): void =
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
   } catch (e) {
-    console.error('Failed to save payment submissions:', e);
+    console.warn('LocalStorage quota exceeded on full submissions. Pruning proof image strings to save space...');
+    try {
+      // Tier 1 fallback: Prune heavy base64 proofDataUrl from non-pending or older submissions
+      const pruned = submissions.map((sub, idx) => {
+        if (sub.status !== 'pending' || idx > 5) {
+          const { proofDataUrl, ...rest } = sub;
+          return rest as PaymentSubmission;
+        }
+        return sub;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pruned));
+    } catch (e2) {
+      console.warn('LocalStorage quota still exceeded. Keeping recent submissions without proof images...');
+      try {
+        // Tier 2 fallback: Strip proofDataUrl for all items and keep top 25
+        const minimal = submissions.slice(0, 25).map((sub) => {
+          const { proofDataUrl, ...rest } = sub;
+          return rest as PaymentSubmission;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(minimal));
+      } catch (e3) {
+        console.error('Critical: LocalStorage quota exceeded for payment submissions:', e3);
+      }
+    }
   }
 };
 
@@ -78,6 +101,10 @@ export const submitPaymentProof = (params: {
   all.unshift(newSubmission);
   savePaymentSubmissions(all);
   savePaymentSubmissionToFirestore(newSubmission);
+  
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('naira9ja_payment_submissions_updated'));
+  }
 
   return {
     success: true,
@@ -129,17 +156,14 @@ export const approvePaymentSubmission = (
     if (targetUser) {
       let message = `Your payment of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was APPROVED by Service!`;
 
-      const isActivationType = sub.type === 'activation' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('activation'));
+      const isNairaCodeType = sub.type === 'naira_code' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('naira code'));
+      const isActivationType = !isNairaCodeType && (sub.type === 'activation' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('activation')));
 
       // Perform automatic benefit fulfillment
       if (sub.type === 'upgrade' && sub.targetLevel) {
         targetUser.level = sub.targetLevel;
         message += ` Your account has been upgraded to Level ${sub.targetLevel}.`;
-      } else if (isActivationType) {
-        targetUser.imminentDeactivationExpiry = undefined;
-        targetUser.deactivationDate = undefined;
-        message += ` Your account activation is now complete and active.`;
-      } else if (sub.type === 'naira_code') {
+      } else if (isNairaCodeType) {
         const codeVal = sub.codeAmount || sub.amount || 7000;
         const randDigits = Math.floor(100000 + Math.random() * 900000);
         const issuedCode = `N9JA-${codeVal}-${randDigits}`;
@@ -158,6 +182,10 @@ export const approvePaymentSubmission = (
         targetUser.nairaCodesHistory.unshift(nairaCodeObj);
 
         message += ` Your Naira CODE (${issuedCode}) has been approved and is now active on your dashboard for withdrawal!`;
+      } else if (isActivationType) {
+        targetUser.imminentDeactivationExpiry = undefined;
+        targetUser.deactivationDate = undefined;
+        message += ` Your account activation is now complete and active.`;
       }
 
       targetUser.attendedByAdmin = true;

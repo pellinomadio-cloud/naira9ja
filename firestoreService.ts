@@ -81,8 +81,25 @@ export const savePaymentSubmissionToFirestore = async (
   if (!submission || !submission.id) return;
   try {
     const subRef = doc(db, PAYMENTS_COLLECTION, submission.id);
-    const cleanSub = JSON.parse(JSON.stringify(submission));
-    await setDoc(subRef, cleanSub, { merge: true });
+    let cleanSub = JSON.parse(JSON.stringify(submission));
+
+    // If proofDataUrl base64 is large (>500KB), strip it for the primary setDoc call to guarantee Firestore doc size limits are met
+    if (cleanSub.proofDataUrl && cleanSub.proofDataUrl.length > 500000) {
+      console.warn('Payment proof base64 is large (>500KB). Stripping base64 for Firestore document safety.');
+      delete cleanSub.proofDataUrl;
+    }
+
+    try {
+      await setDoc(subRef, cleanSub, { merge: true });
+    } catch (setErr) {
+      console.warn('Initial setDoc failed on Firestore payment_submissions. Retrying without proofDataUrl:', setErr);
+      if (cleanSub.proofDataUrl) {
+        delete cleanSub.proofDataUrl;
+        await setDoc(subRef, cleanSub, { merge: true });
+      } else {
+        throw setErr;
+      }
+    }
   } catch (err) {
     console.error('Error saving payment submission to Firestore:', err);
   }
@@ -134,7 +151,21 @@ export const subscribeToPaymentSubmissions = (
           if (localSub.status !== 'pending' && fsSub.status === 'pending') {
             savePaymentSubmissionToFirestore(localSub);
           } else {
-            map.set(fsSub.id, fsSub);
+            // Keep local proofDataUrl if Firestore version doesn't have one
+            map.set(fsSub.id, {
+              ...fsSub,
+              proofDataUrl: fsSub.proofDataUrl || localSub.proofDataUrl
+            });
+          }
+        }
+      });
+
+      // Sync any local submission missing from Firestore snapshot up to Firestore
+      localSubmissions.forEach((localSub) => {
+        if (localSub && localSub.id) {
+          const existsInFs = firestoreSubmissions.some((fs) => fs.id === localSub.id);
+          if (!existsInFs) {
+            savePaymentSubmissionToFirestore(localSub);
           }
         }
       });
@@ -143,7 +174,27 @@ export const subscribeToPaymentSubmissions = (
       try {
         localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(merged));
       } catch (e) {
-        console.error('Error syncing submissions to localStorage:', e);
+        console.warn('LocalStorage quota exceeded in firestoreService sync. Applying fallback pruning...');
+        try {
+          const pruned = merged.map((sub, idx) => {
+            if (sub.status !== 'pending' || idx > 5) {
+              const { proofDataUrl, ...rest } = sub;
+              return rest as PaymentSubmission;
+            }
+            return sub;
+          });
+          localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(pruned));
+        } catch (e2) {
+          try {
+            const minimal = merged.slice(0, 25).map((sub) => {
+              const { proofDataUrl, ...rest } = sub;
+              return rest as PaymentSubmission;
+            });
+            localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(minimal));
+          } catch (e3) {
+            console.warn('Could not cache payment submissions to localStorage due to strict quota limits:', e3);
+          }
+        }
       }
       callback(merged);
     },

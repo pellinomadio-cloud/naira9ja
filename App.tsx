@@ -113,9 +113,34 @@ const App: React.FC = () => {
     saveUserToFirestore(u);
   };
 
-  // Real-time Firestore sync for active user
+  // Real-time Firestore sync & local event listener for active user
   useEffect(() => {
     if (!user?.email) return;
+
+    const handleLocalUserUpdate = () => {
+      try {
+        const storedUsersStr = localStorage.getItem('naira9ja_users');
+        if (storedUsersStr) {
+          const usersMap = JSON.parse(storedUsersStr);
+          const activeKey = user.email.toLowerCase();
+          const updatedUser = usersMap[activeKey];
+          if (updatedUser) {
+            setUser((prev) => {
+              if (!prev) return updatedUser;
+              if (JSON.stringify(prev) !== JSON.stringify(updatedUser)) {
+                return updatedUser;
+              }
+              return prev;
+            });
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    window.addEventListener('naira9ja_users_updated', handleLocalUserUpdate);
+
     const unsub = subscribeToUsers((firestoreUsers) => {
       const activeKey = user.email.toLowerCase();
       const updatedUser = firestoreUsers[activeKey];
@@ -130,7 +155,11 @@ const App: React.FC = () => {
         });
       }
     });
-    return () => unsub();
+
+    return () => {
+      window.removeEventListener('naira9ja_users_updated', handleLocalUserUpdate);
+      unsub();
+    };
   }, [user?.email]);
 
   // Check Loan Expiry and Auto-Debit

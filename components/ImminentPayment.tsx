@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { useAppSettings } from '../appSettings';
 import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
+import { compressImageFile } from '../utils/imageCompressor';
 
 interface ImminentPaymentProps {
   userEmail?: string;
@@ -51,15 +52,17 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
     );
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setProofFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPaymentProof(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file, 500, 0.6);
+        setPaymentProof(compressed);
+      } catch (err) {
+        console.error('Failed to compress image:', err);
+        setPaymentProof(undefined);
+      }
     }
   };
 

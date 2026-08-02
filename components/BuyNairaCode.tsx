@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { useAppSettings } from '../appSettings';
 import { submitPaymentProof, getUserPendingSubmission } from '../paymentService';
+import { compressImageFile } from '../utils/imageCompressor';
 
 interface BuyNairaCodeProps {
   userEmail?: string;
@@ -54,15 +55,17 @@ const BuyNairaCode: React.FC<BuyNairaCodeProps> = ({ userEmail = '', userName = 
     return () => clearTimeout(timer);
   }, [activeEmail]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setProofFile(file);
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProofDataUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file, 500, 0.6);
+        setProofDataUrl(compressed);
+      } catch (err) {
+        console.error('Failed to compress image:', err);
+        setProofDataUrl(undefined);
+      }
     } else {
       setProofDataUrl(undefined);
     }
