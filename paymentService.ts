@@ -112,17 +112,32 @@ export const approvePaymentSubmission = (
     const storedUsersStr = localStorage.getItem('naira9ja_users');
     const usersMap: Record<string, User> = storedUsersStr ? JSON.parse(storedUsersStr) : {};
     const targetEmailKey = sub.userEmail ? sub.userEmail.toLowerCase() : '';
-    const targetUser = targetEmailKey ? usersMap[targetEmailKey] : undefined;
+    
+    let matchedKey = Object.keys(usersMap).find((k) => k.toLowerCase() === targetEmailKey);
+    let targetUser = matchedKey ? usersMap[matchedKey] : undefined;
+
+    if (!targetUser && sub.userEmail) {
+      targetUser = {
+        name: sub.userName || 'User',
+        email: sub.userEmail,
+        balance: 0,
+        level: sub.targetLevel || 1
+      };
+      matchedKey = targetEmailKey;
+    }
 
     if (targetUser) {
       let message = `Your payment of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was APPROVED by Service!`;
+
+      const isActivationType = sub.type === 'activation' || (sub.itemDescription && sub.itemDescription.toLowerCase().includes('activation'));
 
       // Perform automatic benefit fulfillment
       if (sub.type === 'upgrade' && sub.targetLevel) {
         targetUser.level = sub.targetLevel;
         message += ` Your account has been upgraded to Level ${sub.targetLevel}.`;
-      } else if (sub.type === 'activation') {
+      } else if (isActivationType) {
         targetUser.imminentDeactivationExpiry = undefined;
+        targetUser.deactivationDate = undefined;
         message += ` Your account activation is now complete and active.`;
       } else if (sub.type === 'naira_code') {
         const codeVal = sub.codeAmount || sub.amount || 7000;
@@ -147,7 +162,7 @@ export const approvePaymentSubmission = (
 
       targetUser.attendedByAdmin = true;
       targetUser.adminMessage = message;
-      usersMap[targetEmailKey] = targetUser;
+      usersMap[matchedKey || targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
       saveUserToFirestore(targetUser);
 
@@ -155,6 +170,8 @@ export const approvePaymentSubmission = (
         onUserUpdateCallback(targetUser);
       }
     }
+    window.dispatchEvent(new Event('naira9ja_payment_submissions_updated'));
+    window.dispatchEvent(new Event('naira9ja_users_updated'));
   } catch (e) {
     console.error('Failed to update target user during approval:', e);
   }
@@ -192,12 +209,22 @@ export const declinePaymentSubmission = (
     const storedUsersStr = localStorage.getItem('naira9ja_users');
     const usersMap: Record<string, User> = storedUsersStr ? JSON.parse(storedUsersStr) : {};
     const targetEmailKey = sub.userEmail ? sub.userEmail.toLowerCase() : '';
-    const targetUser = targetEmailKey ? usersMap[targetEmailKey] : undefined;
+    let matchedKey = Object.keys(usersMap).find((k) => k.toLowerCase() === targetEmailKey);
+    let targetUser = matchedKey ? usersMap[matchedKey] : undefined;
+
+    if (!targetUser && sub.userEmail) {
+      targetUser = {
+        name: sub.userName || 'User',
+        email: sub.userEmail,
+        balance: 0
+      };
+      matchedKey = targetEmailKey;
+    }
 
     if (targetUser) {
       targetUser.attendedByAdmin = true;
       targetUser.adminMessage = `Your payment submission of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was DECLINED by Service.\nReason: ${reason}`;
-      usersMap[targetEmailKey] = targetUser;
+      usersMap[matchedKey || targetEmailKey] = targetUser;
       localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
       saveUserToFirestore(targetUser);
 
@@ -205,6 +232,8 @@ export const declinePaymentSubmission = (
         onUserUpdateCallback(targetUser);
       }
     }
+    window.dispatchEvent(new Event('naira9ja_payment_submissions_updated'));
+    window.dispatchEvent(new Event('naira9ja_users_updated'));
   } catch (e) {
     console.error('Failed to update target user during decline:', e);
   }
