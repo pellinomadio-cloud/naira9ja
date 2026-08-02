@@ -39,27 +39,35 @@ export const subscribeToUsers = (
   return onSnapshot(
     usersRef,
     (snapshot) => {
-      const usersMap: Record<string, User> = {};
+      const firestoreUsers: Record<string, User> = {};
       snapshot.forEach((docSnap) => {
         const u = docSnap.data() as User;
         if (u && u.email) {
-          usersMap[u.email.toLowerCase()] = u;
+          firestoreUsers[u.email.toLowerCase()] = u;
         }
       });
-      if (Object.keys(usersMap).length > 0) {
-        try {
-          const stored = localStorage.getItem('naira9ja_users');
-          const localUsersMap: Record<string, User> = stored ? JSON.parse(stored) : {};
-          const merged = { ...localUsersMap, ...usersMap };
-          localStorage.setItem('naira9ja_users', JSON.stringify(merged));
-        } catch (e) {
-          console.error('Error merging users to localStorage:', e);
-        }
+      
+      try {
+        const stored = localStorage.getItem('naira9ja_users');
+        const localUsersMap: Record<string, User> = stored ? JSON.parse(stored) : {};
+        const merged = { ...localUsersMap, ...firestoreUsers };
+        localStorage.setItem('naira9ja_users', JSON.stringify(merged));
+        callback(merged);
+      } catch (e) {
+        console.error('Error merging users to localStorage:', e);
+        callback(firestoreUsers);
       }
-      callback(usersMap);
     },
     (error) => {
       console.warn('Firestore users subscription notice:', error.message);
+      try {
+        const stored = localStorage.getItem('naira9ja_users');
+        if (stored) {
+          callback(JSON.parse(stored));
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   );
 };
@@ -90,22 +98,65 @@ export const subscribeToPaymentSubmissions = (
   return onSnapshot(
     paymentsRef,
     (snapshot) => {
-      const submissions: PaymentSubmission[] = [];
+      const firestoreSubmissions: PaymentSubmission[] = [];
       snapshot.forEach((docSnap) => {
-        submissions.push(docSnap.data() as PaymentSubmission);
-      });
-      submissions.sort((a, b) => b.createdAt - a.createdAt);
-      if (submissions.length > 0) {
-        try {
-          localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(submissions));
-        } catch (e) {
-          console.error('Error syncing submissions to localStorage:', e);
+        const data = docSnap.data() as PaymentSubmission;
+        if (data && data.id) {
+          firestoreSubmissions.push(data);
         }
+      });
+
+      // Get current local storage items
+      let localSubmissions: PaymentSubmission[] = [];
+      try {
+        const localDataStr = localStorage.getItem('naira9ja_payment_submissions');
+        localSubmissions = localDataStr ? JSON.parse(localDataStr) : [];
+      } catch (e) {
+        localSubmissions = [];
       }
-      callback(submissions);
+
+      const map = new Map<string, PaymentSubmission>();
+
+      // Put local submissions in map first
+      localSubmissions.forEach((s) => {
+        if (s && s.id) {
+          map.set(s.id, s);
+        }
+      });
+
+      // Merge Firestore submissions
+      firestoreSubmissions.forEach((fsSub) => {
+        const localSub = map.get(fsSub.id);
+        if (!localSub) {
+          map.set(fsSub.id, fsSub);
+        } else {
+          // If local status is approved or declined but Firestore snapshot is still pending, keep local status and persist to Firestore
+          if (localSub.status !== 'pending' && fsSub.status === 'pending') {
+            savePaymentSubmissionToFirestore(localSub);
+          } else {
+            map.set(fsSub.id, fsSub);
+          }
+        }
+      });
+
+      const merged = Array.from(map.values()).sort((a, b) => b.createdAt - a.createdAt);
+      try {
+        localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(merged));
+      } catch (e) {
+        console.error('Error syncing submissions to localStorage:', e);
+      }
+      callback(merged);
     },
     (error) => {
       console.warn('Firestore payment submissions subscription notice:', error.message);
+      try {
+        const localDataStr = localStorage.getItem('naira9ja_payment_submissions');
+        if (localDataStr) {
+          callback(JSON.parse(localDataStr));
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   );
 };

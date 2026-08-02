@@ -104,10 +104,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setAppSettings(firestoreSettings);
     });
 
+    // Listen to local update events
+    const handleSubmissionsUpdated = () => {
+      loadSubmissions();
+    };
+    const handleUsersUpdated = () => {
+      loadUsersFromStorage();
+    };
+
+    window.addEventListener('naira9ja_payment_submissions_updated', handleSubmissionsUpdated);
+    window.addEventListener('naira9ja_users_updated', handleUsersUpdated);
+
     return () => {
       unsubUsers();
       unsubPayments();
       unsubSettings();
+      window.removeEventListener('naira9ja_payment_submissions_updated', handleSubmissionsUpdated);
+      window.removeEventListener('naira9ja_users_updated', handleUsersUpdated);
     };
   }, []);
 
@@ -609,26 +622,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             ))}
           </div>
 
-          {/* Status Filter Pills */}
-          <div className="flex space-x-2">
+          {/* Status Filter Pages Tabs */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { id: 'pending', label: `Pending (${pendingCount})` },
-              { id: 'all', label: `All Statuses (${paymentSubmissions.length})` },
-              { id: 'approved', label: 'Approved' },
-              { id: 'declined', label: 'Declined' }
+              { id: 'pending', label: '🟡 Pending Approvals', count: pendingCount, color: 'from-amber-600 to-amber-700' },
+              { id: 'approved', label: '🟢 Approved Archive', count: paymentSubmissions.filter(s => s.status === 'approved').length, color: 'from-emerald-600 to-teal-600' },
+              { id: 'declined', label: '🔴 Declined Archive', count: paymentSubmissions.filter(s => s.status === 'declined').length, color: 'from-rose-700 to-red-700' },
+              { id: 'all', label: '📋 All Logs', count: paymentSubmissions.length, color: 'from-indigo-600 to-purple-600' }
             ].map((f) => (
               <button
                 key={f.id}
+                type="button"
                 onClick={() => setPaymentFilter(f.id as any)}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${
+                className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all border flex flex-col items-center justify-center space-y-0.5 ${
                   paymentFilter === f.id
-                    ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white border-red-500 shadow-md'
+                    ? `bg-gradient-to-r ${f.color} text-white border-white/40 shadow-lg scale-[1.02]`
                     : 'bg-[#12142e] text-slate-400 border-[#242a5a] hover:text-white'
                 }`}
               >
-                {f.label}
+                <span>{f.label}</span>
+                <span className="text-[10px] font-mono opacity-80">({f.count})</span>
               </button>
             ))}
+          </div>
+
+          {/* Subpage Context Explanation Banner */}
+          <div className="p-3.5 rounded-2xl bg-[#141738] border border-[#272d66] text-xs flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+              <p className="text-slate-300 font-medium text-[11px]">
+                {paymentFilter === 'pending' && '📄 Page: Pending Approvals — Review new payment receipts. Approved items automatically move to the Approved Archive page.'}
+                {paymentFilter === 'approved' && '✅ Page: Approved Payments Archive — Verified payments and activated users.'}
+                {paymentFilter === 'declined' && '❌ Page: Declined Payments Archive — Rejected receipts and decline notes.'}
+                {paymentFilter === 'all' && '📂 Page: All Payment Logs — Searchable master history of all payment proofs.'}
+              </p>
+            </div>
           </div>
 
           {/* Submissions List */}
