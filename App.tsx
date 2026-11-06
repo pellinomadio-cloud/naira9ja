@@ -35,7 +35,7 @@ import { Icons } from './components/Icons';
 import { User, Transaction, RewardStatus, UpgradeLevelPlan } from './types';
 import { saveUserToFirestore, subscribeToUsers, safeSaveUsersToLocalStorage } from './firestoreService';
 
-const IS_UNDER_MAINTENANCE = true;
+const IS_UNDER_MAINTENANCE = false;
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
