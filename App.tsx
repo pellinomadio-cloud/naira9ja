@@ -30,9 +30,12 @@ import Loan from './components/Loan';
 import { AdminPanel } from './components/AdminPanel';
 import { getAppSettings, useAppSettings } from './appSettings';
 import { Suspended } from './components/Suspended';
+import { MaintenanceScreen } from './components/MaintenanceScreen';
 import { Icons } from './components/Icons';
 import { User, Transaction, RewardStatus, UpgradeLevelPlan } from './types';
 import { saveUserToFirestore, subscribeToUsers, safeSaveUsersToLocalStorage } from './firestoreService';
+
+const IS_UNDER_MAINTENANCE = true;
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
@@ -599,6 +602,10 @@ const App: React.FC = () => {
     const interval = setInterval(() => setShowInviteAd(true), 60000);
     return () => clearInterval(interval);
   }, [currentView]);
+
+  if (IS_UNDER_MAINTENANCE) {
+    return <MaintenanceScreen />;
+  }
 
   if (currentView === 'register') return <div className={darkMode ? 'dark' : ''}><Register onRegister={handleRegister} onSwitchToLogin={() => setCurrentView('login')} /></div>;
   if (currentView === 'login') return <div className={darkMode ? 'dark' : ''}><Login onLogin={handleLogin} onSwitchToRegister={() => setCurrentView('register')} /></div>;
