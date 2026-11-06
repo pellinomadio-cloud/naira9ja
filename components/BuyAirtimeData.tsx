@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { User } from '../types';
@@ -12,7 +11,7 @@ interface BuyAirtimeDataProps {
 
 const networks = [
   { id: 'mtn', name: 'MTN', color: 'bg-yellow-400' },
-  { id: 'glo', name: 'GLO', color: 'bg-green-500' },
+  { id: 'glo', name: 'GLO', color: 'bg-emerald-500' },
   { id: 'airtel', name: 'Airtel', color: 'bg-red-500' },
   { id: '9mobile', name: '9Mobile', color: 'bg-green-700' },
 ];
@@ -50,7 +49,7 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
         return;
     }
 
-    if (nairaCode !== VALID_NAIRA_CODE) {
+    if (nairaCode.trim().toUpperCase() !== VALID_NAIRA_CODE.toUpperCase()) {
         setError('Invalid Naira CODE. Please purchase a valid code to proceed.');
         return;
     }
@@ -85,24 +84,24 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
         onPurchase(purchaseAmount, desc);
         setIsLoading(false);
         setStep('success');
-    }, 1500);
+    }, 1200);
   };
 
   if (step === 'success') {
     return (
-        <div className="px-4 py-8 flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-300">
-           <div className="w-24 h-24 bg-green-neon/10 rounded-full flex items-center justify-center mb-4">
-              <Icons.Check size={48} className="text-green-neon" />
+        <div className="px-4 py-8 flex flex-col items-center justify-center text-center space-y-4 animate-in zoom-in duration-300">
+           <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-2 border border-emerald-300">
+              <Icons.Check size={32} className="text-emerald-700" />
           </div>
           <div>
-              <h2 className="text-2xl font-bold text-white mb-1 uppercase tracking-tighter">Purchase Successful!</h2>
-              <p className="text-gray-500 text-sm">
-                  Your {type === 'airtime' ? 'Airtime' : 'Data'} purchase was successful.
+              <h2 className="text-lg font-black text-slate-900 mb-0.5 uppercase tracking-tight">Purchase Successful!</h2>
+              <p className="text-slate-500 text-xs">
+                  Your {type === 'airtime' ? 'Airtime' : 'Data'} purchase was processed.
               </p>
           </div>
           <button 
               onClick={onBack}
-              className="w-full max-w-sm bg-green-neon text-black font-black py-4 rounded-xl shadow-xl transition-all uppercase tracking-widest"
+              className="w-full max-w-sm bg-black hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl shadow-xs transition-all uppercase tracking-wider text-xs border border-blue-500/50"
           >
               Done
           </button>
@@ -111,24 +110,25 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
   }
 
   return (
-    <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center">
-        <div className={`inline-flex items-center justify-center p-3 rounded-full mb-2 bg-green-neon/10 text-green-neon`}>
-            {type === 'airtime' ? <Icons.Airtime size={32} /> : <Icons.Data size={32} />}
+    <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
+      <div className="text-center space-y-0.5">
+        <div className="inline-flex items-center justify-center p-2.5 rounded-2xl mb-1 bg-black text-white border border-blue-500/50 shadow-xs">
+            {type === 'airtime' ? <Icons.Airtime size={20} className="text-blue-400" /> : <Icons.Data size={20} className="text-blue-400" />}
         </div>
-        <h2 className="text-xl font-black text-white uppercase tracking-tight">Buy {type}</h2>
+        <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Buy {type}</h2>
+        <p className="text-xs text-slate-500 font-medium">Recharge your phone or data line instantly</p>
       </div>
 
-      <form onSubmit={handlePurchase} className="space-y-6">
+      <form onSubmit={handlePurchase} className="space-y-3.5 bg-white p-4.5 rounded-3xl border border-pink-200 shadow-sm shadow-pink-500/5">
         {error && (
-             <div className="bg-red-900/20 text-red-400 text-sm p-3 rounded-xl text-center border border-red-800 animate-pulse font-bold">
+             <div className="bg-rose-50 text-rose-700 text-xs p-2.5 rounded-xl text-center border border-rose-200 font-bold">
                 {error}
               </div>
         )}
 
         {/* Network Selection */}
         <div>
-            <label className="block text-xs font-black text-gray-500 mb-2 ml-1 uppercase tracking-widest">Select Network</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1 ml-0.5 uppercase tracking-wider">Select Network</label>
             <div className="grid grid-cols-4 gap-2">
                 {networks.map((net) => (
                     <div 
@@ -136,11 +136,11 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
                         onClick={() => setNetwork(net.id)}
                         className={`
                             cursor-pointer rounded-xl p-2 flex flex-col items-center justify-center border transition-all
-                            ${network === net.id ? 'border-green-neon bg-green-neon/5' : 'border-gray-800 bg-gray-900'}
+                            ${network === net.id ? 'border-blue-500 bg-blue-50' : 'border-pink-200 bg-pink-50/50'}
                         `}
                     >
-                        <div className={`w-8 h-8 rounded-full mb-1 ${net.color} shadow-sm`}></div>
-                        <span className="text-[10px] font-bold text-gray-300">{net.name}</span>
+                        <div className={`w-6 h-6 rounded-full mb-1 ${net.color} shadow-xs`}></div>
+                        <span className="text-[10px] font-bold text-slate-800">{net.name}</span>
                     </div>
                 ))}
             </div>
@@ -148,17 +148,17 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
 
         {/* Phone Number */}
         <div>
-            <label className="block text-xs font-black text-gray-500 mb-1 ml-1 uppercase tracking-widest">Phone Number</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1 ml-0.5 uppercase tracking-wider">Phone Number</label>
             <div className="relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Icons.User className="h-5 w-5 text-gray-500" />
+                    <Icons.User className="h-4 w-4 text-slate-400" />
                  </div>
                 <input
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="08012345678"
-                    className="w-full pl-10 p-4 bg-gray-900 border border-gray-800 rounded-xl text-white focus:ring-2 focus:ring-green-neon outline-none font-mono text-lg tracking-wide"
+                    className="w-full pl-9 p-2.5 bg-pink-50/50 border border-pink-200 rounded-xl text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono text-xs tracking-wider"
                 />
             </div>
         </div>
@@ -166,21 +166,21 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
         {/* Amount or Plan Selection */}
         {type === 'airtime' ? (
             <div>
-                <label className="block text-xs font-black text-gray-500 mb-1 ml-1 uppercase tracking-widest">Amount (₦)</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1 ml-0.5 uppercase tracking-wider">Amount (₦)</label>
                 <input
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="100"
-                    className="w-full p-4 bg-gray-900 border border-gray-800 rounded-xl text-white font-black text-xl focus:ring-2 focus:ring-green-neon outline-none"
+                    className="w-full p-2.5 bg-pink-50/50 border border-pink-200 rounded-xl text-slate-900 font-bold text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                 />
-                <div className="flex gap-2 mt-2 overflow-x-auto no-scrollbar pb-1">
+                <div className="flex gap-1.5 mt-2 overflow-x-auto no-scrollbar pb-1">
                     {[100, 200, 500, 1000, 2000].map(amt => (
                         <button
                             type="button"
                             key={amt}
                             onClick={() => setAmount(amt.toString())}
-                            className={`px-4 py-2 rounded-full text-xs font-black whitespace-nowrap transition-colors ${amount === amt.toString() ? 'bg-green-neon text-black' : 'bg-gray-800 text-gray-300 hover:bg-green-neon/10 hover:text-green-neon'}`}
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap transition-colors ${amount === amt.toString() ? 'bg-black text-white' : 'bg-pink-50 text-slate-700 border border-pink-200'}`}
                         >
                             ₦{amt}
                         </button>
@@ -189,16 +189,16 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
             </div>
         ) : (
             <div>
-                <label className="block text-xs font-black text-gray-500 mb-1 ml-1 uppercase tracking-widest">Data Plan</label>
-                <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-700 mb-1 ml-0.5 uppercase tracking-wider">Data Plan</label>
+                <div className="space-y-1.5">
                     {dataPlans.map(plan => (
                         <div 
                             key={plan.id}
                             onClick={() => setSelectedPlan(plan.id)}
-                            className={`p-4 rounded-xl border flex justify-between items-center cursor-pointer transition-all ${selectedPlan === plan.id ? 'border-green-neon bg-green-neon/5' : 'border-gray-800 bg-gray-900'}`}
+                            className={`p-2.5 rounded-xl border flex justify-between items-center cursor-pointer transition-all ${selectedPlan === plan.id ? 'border-blue-500 bg-blue-50' : 'border-pink-200 bg-pink-50/50'}`}
                         >
-                            <span className="font-black text-white text-sm uppercase tracking-tight">{plan.name}</span>
-                            <span className="font-black text-green-neon">₦{plan.price.toLocaleString()}</span>
+                            <span className="font-bold text-slate-800 text-xs">{plan.name}</span>
+                            <span className="font-black text-blue-700 text-xs">₦{plan.price.toLocaleString()}</span>
                         </div>
                     ))}
                 </div>
@@ -207,33 +207,33 @@ const BuyAirtimeData: React.FC<BuyAirtimeDataProps> = ({ type, user, onPurchase,
 
         {/* Naira CODE Input */}
         <div>
-            <label className="block text-xs font-black text-gray-500 mb-1 ml-1 uppercase tracking-widest">Naira CODE</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1 ml-0.5 uppercase tracking-wider">Naira CODE</label>
             <div className="relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Icons.ShieldCheck className="h-5 w-5 text-gray-500" />
+                    <Icons.ShieldCheck className="h-4 w-4 text-slate-400" />
                  </div>
                 <input
                     type="text"
                     value={nairaCode}
                     onChange={(e) => setNairaCode(e.target.value)}
                     placeholder="Enter Naira CODE"
-                    className="w-full pl-10 p-4 bg-gray-900 border border-gray-800 rounded-xl text-white focus:ring-2 focus:ring-green-neon outline-none font-mono text-lg tracking-widest placeholder:text-gray-700"
+                    className="w-full pl-9 p-2.5 bg-pink-50/50 border border-pink-200 rounded-xl text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono text-xs tracking-wider"
                 />
             </div>
-            <p className="text-[10px] text-gray-500 mt-2 ml-1 font-bold uppercase">Required to perform this transaction</p>
         </div>
 
+        {/* Black Button with Touch of Blue */}
         <button
             type="submit"
             disabled={isLoading || !network || !phoneNumber || (type === 'airtime' ? !amount : !selectedPlan) || !nairaCode}
-            className="w-full py-4 bg-green-neon hover:bg-green-dark disabled:bg-gray-800 text-black font-black rounded-xl shadow-xl transition-all mt-4 flex items-center justify-center space-x-2 uppercase tracking-widest animate-pulse"
+            className="w-full py-2.5 px-4 bg-black hover:bg-slate-900 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-[0_2px_10px_rgba(37,99,235,0.25)] border border-blue-500/50 transition-all mt-2 flex items-center justify-center space-x-2 uppercase tracking-wider active:scale-95"
         >
             {isLoading ? (
                 <span>Processing...</span>
             ) : (
                 <>
                     <span>Buy {type === 'airtime' ? 'Airtime' : 'Data'}</span>
-                    <Icons.ArrowRight size={20} />
+                    <Icons.ArrowRight size={15} className="text-blue-400" />
                 </>
             )}
         </button>

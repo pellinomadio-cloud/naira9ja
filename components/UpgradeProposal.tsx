@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 import { UpgradeLevelPlan } from '../types';
@@ -16,20 +15,20 @@ export const getUpgradePlans = (passedSettings?: AppSettings): UpgradeLevelPlan[
   return [
     {
       level: 2,
-      name: 'Level 2 • Scholar',
+      name: 'Tier 2 • Scholar',
       price: settings.level2Price,
       priceFormatted: `₦${settings.level2Price.toLocaleString()}`,
-      badge: 'Popular Upgrade',
+      badge: 'Compulsory for Withdrawals',
       features: [
+        'Mandatory upgrade to release pending bank withdrawals',
         'Increased daily withdrawal limit',
         '2x Quiz & Daily Task Rewards',
-        'Priority payment queue',
-        'Standard customer support'
+        'Priority payout verification queue'
       ]
     },
     {
       level: 3,
-      name: 'Level 3 • Master',
+      name: 'Tier 3 • Master',
       price: settings.level3Price,
       priceFormatted: `₦${settings.level3Price.toLocaleString()}`,
       badge: 'High Earner',
@@ -42,7 +41,7 @@ export const getUpgradePlans = (passedSettings?: AppSettings): UpgradeLevelPlan[
     },
     {
       level: 4,
-      name: 'Level 4 • VIP Pro',
+      name: 'Tier 4 • VIP Pro',
       price: settings.level4Price,
       priceFormatted: `₦${settings.level4Price.toLocaleString()}`,
       badge: 'Maximum Rewards',
@@ -66,26 +65,26 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ currentLevel = 1, onP
   const activePlan = upgradePlans.find(p => p.level === selectedLevel) || upgradePlans[0];
 
   return (
-    <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+    <div className="px-4 py-5 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-[0_0_25px_rgba(124,58,237,0.5)] border border-purple-400/30 mb-2">
-          <Icons.TrendingUp size={32} className="text-white" />
+      <div className="text-center space-y-1.5">
+        <div className="mx-auto w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-xs border border-blue-500/50 mb-1">
+          <Icons.TrendingUp size={24} className="text-blue-400" />
         </div>
-        <h2 className="text-2xl font-black text-white tracking-tight">Account Level Upgrade</h2>
-        <p className="text-xs text-slate-300 max-w-xs mx-auto">
-          All user accounts start on <span className="text-purple-400 font-bold">Level 1</span>. Upgrade your account level to unlock higher daily earnings and instant bank withdrawals.
+        <h2 className="text-xl font-black text-slate-900 tracking-tight">Account Tier Upgrade</h2>
+        <p className="text-xs text-slate-600 max-w-xs mx-auto leading-relaxed">
+          Upgrading to <span className="text-rose-600 font-bold">Tier 2</span> is <strong className="text-slate-900 font-black">very compulsory</strong> to release and complete your bank withdrawals.
         </p>
 
         {/* Current Status Badge */}
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#181a3c] border border-[#2d3269] text-xs font-semibold text-slate-300 mt-2">
-          <span className="text-amber-400">⭐</span>
-          <span>Your Current Status: <strong className="text-white">Level {currentLevel}</strong></span>
+        <div className="inline-flex items-center space-x-1.5 px-3 py-0.5 rounded-full bg-white border border-pink-200 text-xs font-semibold text-slate-700 mt-1 shadow-2xs">
+          <span className="text-amber-500">⭐</span>
+          <span>Your Status: <strong className="text-slate-900 font-bold">Level {currentLevel}</strong></span>
         </div>
       </div>
 
       {/* Plan Selector Tabs */}
-      <div className="grid grid-cols-3 gap-2 p-1.5 bg-[#12142e] rounded-2xl border border-[#212552]">
+      <div className="grid grid-cols-3 gap-2 p-1.5 bg-white rounded-2xl border border-pink-200 shadow-2xs">
         {upgradePlans.map((plan) => {
           const isSelected = plan.level === selectedLevel;
           const isCurrent = plan.level <= currentLevel;
@@ -93,16 +92,16 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ currentLevel = 1, onP
             <button
               key={plan.level}
               onClick={() => setSelectedLevel(plan.level)}
-              className={`py-3 px-2 rounded-xl flex flex-col items-center justify-center space-y-1 transition-all ${
+              className={`py-2 px-1.5 rounded-xl flex flex-col items-center justify-center space-y-0.5 transition-all ${
                 isSelected 
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg border border-purple-400/40' 
-                  : 'text-slate-400 hover:text-white bg-[#181a3c]/60'
+                  ? 'bg-black text-white shadow-xs border border-blue-500' 
+                  : 'text-slate-600 hover:text-slate-900 bg-pink-50/60'
               }`}
             >
-              <span className="text-xs font-black">Level {plan.level}</span>
-              <span className="text-[11px] font-extrabold">{plan.priceFormatted}</span>
+              <span className="text-xs font-black">Tier {plan.level}</span>
+              <span className={`text-[10px] font-extrabold ${isSelected ? 'text-blue-300' : 'text-slate-700'}`}>{plan.priceFormatted}</span>
               {isCurrent && (
-                <span className="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold">Active</span>
+                <span className="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.2 rounded font-bold">Active</span>
               )}
             </button>
           );
@@ -110,29 +109,29 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ currentLevel = 1, onP
       </div>
 
       {/* Selected Level Details Card */}
-      <div className="bg-[#12142e] rounded-3xl p-6 border border-[#212552] shadow-2xl space-y-5 relative overflow-hidden">
+      <div className="bg-white rounded-3xl p-5 border border-pink-200 shadow-sm shadow-pink-500/5 space-y-4 relative overflow-hidden">
         {activePlan.badge && (
-          <div className="absolute top-4 right-4 bg-purple-950 text-purple-300 border border-purple-800/60 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+          <div className="inline-block bg-rose-100 text-rose-700 border border-rose-300 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider">
             {activePlan.badge}
           </div>
         )}
 
         <div>
-          <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Upgrade Destination</span>
-          <h3 className="text-2xl font-black text-white mt-0.5">{activePlan.name}</h3>
-          <div className="flex items-baseline space-x-2 mt-2">
-            <span className="text-3xl font-black text-white">{activePlan.priceFormatted}</span>
-            <span className="text-xs text-slate-400 font-medium">One-Time Fee • Company Account Transfer</span>
+          <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Upgrade Destination</span>
+          <h3 className="text-lg font-black text-slate-950 mt-0.5">{activePlan.name}</h3>
+          <div className="flex items-baseline space-x-2 mt-1">
+            <span className="text-2xl font-black text-slate-900">{activePlan.priceFormatted}</span>
+            <span className="text-[11px] text-slate-500 font-medium">One-Time Fee • Company Account</span>
           </div>
         </div>
 
-        <div className="space-y-3 pt-2 border-t border-[#1e2247]">
-          <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Plan Benefits</h4>
-          <ul className="space-y-2.5">
+        <div className="space-y-2 pt-2 border-t border-pink-100">
+          <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Plan Benefits</h4>
+          <ul className="space-y-2">
             {activePlan.features.map((feature, i) => (
-              <li key={i} className="flex items-center space-x-3 text-xs text-slate-300 font-medium">
-                <div className="w-5 h-5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 flex items-center justify-center shrink-0">
-                  <Icons.Check size={12} strokeWidth={3} />
+              <li key={i} className="flex items-start space-x-2 text-xs text-slate-700 font-medium">
+                <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icons.Check size={10} strokeWidth={3} />
                 </div>
                 <span>{feature}</span>
               </li>
@@ -141,19 +140,19 @@ const UpgradeProposal: React.FC<UpgradeProposalProps> = ({ currentLevel = 1, onP
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="space-y-3 pt-2">
+      {/* Action Buttons - Black with touch of blue */}
+      <div className="space-y-2 pt-1">
         <button
           onClick={() => onProceed(activePlan)}
-          className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm rounded-2xl shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all flex items-center justify-center space-x-2 active:scale-95"
+          className="w-full py-2.5 px-4 bg-black hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-[0_2px_10px_rgba(37,99,235,0.25)] border border-blue-500 transition-all flex items-center justify-center space-x-1.5 active:scale-95 uppercase tracking-wider"
         >
-          <span>Pay {activePlan.priceFormatted} for Level {activePlan.level}</span>
-          <Icons.ArrowRight size={18} />
+          <span>Pay {activePlan.priceFormatted} for Tier {activePlan.level}</span>
+          <Icons.ArrowRight size={15} className="text-blue-400" />
         </button>
 
         <button
           onClick={onBack}
-          className="w-full py-3 text-slate-400 font-bold hover:text-white text-xs transition-colors text-center"
+          className="w-full py-2 text-slate-500 font-medium hover:text-slate-900 text-xs transition-colors text-center"
         >
           Back to Dashboard
         </button>

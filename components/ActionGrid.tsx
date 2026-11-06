@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Icons } from './Icons';
 import { useAppSettings } from '../appSettings';
@@ -9,54 +8,67 @@ interface ActionGridProps {
 
 export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
   const settings = useAppSettings();
+
   const primaryQuickAccess = [
     {
       id: 'upgrade',
       label: 'Upgrade',
+      sublabel: 'Tier 2',
       icon: Icons.TrendingUp,
-      bg: 'bg-gradient-to-br from-[#4f46e5] to-[#3730a3]',
-      textStyle: 'text-slate-200 font-semibold'
+      iconColor: 'text-sky-400',
+      textColor: 'text-sky-300',
+      borderColor: 'border-sky-500/40',
+      glowShadow: 'shadow-[0_0_12px_rgba(56,189,248,0.25)]'
     },
     {
       id: 'free_withdraw',
-      label: 'Earn More',
+      label: 'Earn',
+      sublabel: 'Tasks',
       icon: Icons.BarChart2,
-      bg: 'bg-gradient-to-br from-[#6d28d9] to-[#4c1d95]',
-      textStyle: 'text-slate-200 font-semibold'
+      iconColor: 'text-emerald-400',
+      textColor: 'text-emerald-300',
+      borderColor: 'border-emerald-500/40',
+      glowShadow: 'shadow-[0_0_12px_rgba(52,211,153,0.25)]'
     },
     {
       id: 'support',
-      label: 'Support',
+      label: 'Help',
+      sublabel: 'Desk',
       icon: Icons.Support,
-      bg: 'bg-gradient-to-br from-[#0284c7] to-[#0369a1]',
-      textStyle: 'text-slate-200 font-semibold'
+      iconColor: 'text-cyan-400',
+      textColor: 'text-cyan-300',
+      borderColor: 'border-cyan-500/40',
+      glowShadow: 'shadow-[0_0_12px_rgba(34,211,238,0.25)]'
     },
     {
       id: 'buy_naira_code',
-      label: 'BUY Naira Code',
+      label: 'Naira Code',
+      sublabel: 'Voucher',
       icon: Icons.Key,
-      bg: 'bg-gradient-to-br from-[#059669] to-[#047857]',
-      textStyle: 'text-emerald-400 font-bold'
+      iconColor: 'text-amber-400',
+      textColor: 'text-amber-300',
+      borderColor: 'border-amber-500/40',
+      glowShadow: 'shadow-[0_0_12px_rgba(251,191,36,0.25)]'
     }
   ];
 
   const secondaryServices = [
-    { id: 'bank', label: 'Withdraw', icon: Icons.Send, color: 'text-indigo-400 bg-indigo-950/60 border-indigo-800/40' },
-    { id: 'airtime', label: 'Airtime', icon: Icons.Airtime, color: 'text-purple-400 bg-purple-950/60 border-purple-800/40' },
-    { id: 'data', label: 'Data', icon: Icons.Data, color: 'text-cyan-400 bg-cyan-950/60 border-cyan-800/40' },
-    { id: 'subscribe', label: 'Naira Code', icon: Icons.FileText, color: 'text-amber-400 bg-amber-950/60 border-amber-800/40' },
-    { id: 'rewards', label: 'Rewards', icon: Icons.Reward, color: 'text-rose-400 bg-rose-950/60 border-rose-800/40' },
-    { id: 'loan', label: 'Loan', icon: Icons.Loan, color: 'text-blue-400 bg-blue-950/60 border-blue-800/40' },
-    { id: 'business', label: 'Business', icon: Icons.Business, color: 'text-teal-400 bg-teal-950/60 border-teal-800/40' },
-    { id: 'invite', label: 'Quiz Game', icon: Icons.Gamepad2, color: 'text-violet-400 bg-violet-950/60 border-violet-800/40' },
+    { id: 'bank', label: 'Withdraw', icon: Icons.Send },
+    { id: 'airtime', label: 'Airtime', icon: Icons.Airtime },
+    { id: 'data', label: 'Data', icon: Icons.Data },
+    { id: 'subscribe', label: 'Vouchers', icon: Icons.FileText },
+    { id: 'rewards', label: 'Rewards', icon: Icons.Reward },
+    { id: 'loan', label: 'Quick Loan', icon: Icons.Loan },
+    { id: 'business', label: 'Business', icon: Icons.Business },
+    { id: 'invite', label: 'Quiz Game', icon: Icons.Gamepad2 },
   ];
 
   return (
-    <div className="space-y-5 my-4">
-      {/* Primary Quick Access matching screenshot */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-white tracking-tight">Quick Access</h3>
-        <div className="grid grid-cols-4 gap-3">
+    <div className="space-y-3.5 my-2">
+      {/* Primary Quick Access - Black Buttons with High-Visibility Non-White Typography */}
+      <div className="space-y-1.5">
+        <h3 className="text-xs font-black text-slate-800 tracking-tight">Quick Access</h3>
+        <div className="grid grid-cols-4 gap-2">
           {primaryQuickAccess.map((item) => {
             const Icon = item.icon;
             return (
@@ -70,39 +82,44 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
                     onActionClick?.(item.id);
                   }
                 }}
-                className="flex flex-col items-center space-y-2 group active:scale-95 transition-transform"
+                className={`bg-black hover:bg-slate-900 border ${item.borderColor} ${item.glowShadow} flex flex-col items-center justify-center p-2.5 rounded-2xl group active:scale-95 transition-all text-center space-y-1`}
               >
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg ${item.bg} border border-white/10 group-hover:brightness-110 transition-all`}>
-                  <Icon size={26} strokeWidth={2.2} />
+                <div className={`w-8 h-8 rounded-xl bg-slate-900/90 border ${item.borderColor} flex items-center justify-center ${item.iconColor} group-hover:scale-105 transition-transform`}>
+                  <Icon size={16} strokeWidth={2.4} />
                 </div>
-                <span className={`text-[11px] text-center leading-tight ${item.textStyle}`}>
-                  {item.label}
-                </span>
+                <div className="leading-tight">
+                  <span className={`text-[11px] font-black block tracking-tight ${item.textColor}`}>
+                    {item.label}
+                  </span>
+                  <span className={`text-[9px] font-bold block opacity-90 ${item.textColor}`}>
+                    {item.sublabel}
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Extended Features & Services Grid */}
-      <div className="bg-[#12142e] rounded-2xl p-4 border border-[#212552] shadow-xl space-y-3">
+      {/* Extended Features & Services Grid in Pink & White */}
+      <div className="bg-white rounded-3xl p-3.5 border border-pink-200 shadow-sm shadow-pink-500/5 space-y-2.5">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Features & Services</h4>
-          <span className="text-[10px] text-indigo-400 font-medium">LearnEarn Hub</span>
+          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Features & Services</h4>
+          <span className="text-[9px] text-blue-600 font-bold">LearnEarn Core</span>
         </div>
-        <div className="grid grid-cols-4 gap-y-4 gap-x-2">
+        <div className="grid grid-cols-4 gap-y-2.5 gap-x-1.5">
           {secondaryServices.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => onActionClick?.(item.id)}
-                className="flex flex-col items-center space-y-1.5 group active:scale-95 transition-all"
+                className="flex flex-col items-center space-y-1 group active:scale-95 transition-all p-1"
               >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all ${item.color} group-hover:scale-105`}>
-                  <Icon size={20} strokeWidth={2} />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-pink-200 bg-pink-50/60 text-slate-800 group-hover:border-blue-400 group-hover:bg-pink-100 transition-all">
+                  <Icon size={16} strokeWidth={2} className="text-blue-600" />
                 </div>
-                <span className="text-[10px] text-slate-300 font-medium text-center leading-tight group-hover:text-white transition-colors">
+                <span className="text-[9px] text-slate-700 font-bold text-center leading-tight group-hover:text-blue-600 transition-colors">
                   {item.label}
                 </span>
               </button>
@@ -115,4 +132,3 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onActionClick }) => {
 };
 
 export default ActionGrid;
-

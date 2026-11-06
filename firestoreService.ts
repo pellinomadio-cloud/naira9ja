@@ -15,6 +15,63 @@ const SETTINGS_COLLECTION = 'settings';
 const CONFIG_DOC_ID = 'app_config';
 
 /**
+ * Safe utility to save users map to localStorage with tiered quota handling
+ */
+export const safeSaveUsersToLocalStorage = (usersMap: Record<string, User>): void => {
+  if (!usersMap || typeof usersMap !== 'object') return;
+  try {
+    localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+  } catch (err) {
+    console.warn('LocalStorage quota reached when saving users map. Applying safe pruning...');
+    try {
+      // Tier 1: Prune large base64 profile pictures from non-active users and truncate transactions
+      const activeSessionEmail = (localStorage.getItem('naira9ja_active_session') || '').toLowerCase();
+      const pruned: Record<string, User> = {};
+      
+      for (const [key, user] of Object.entries(usersMap)) {
+        if (!user) continue;
+        const isCurrent = key.toLowerCase() === activeSessionEmail;
+        pruned[key] = {
+          ...user,
+          profileImage: isCurrent 
+            ? user.profileImage 
+            : (user.profileImage && user.profileImage.length > 5000 ? undefined : user.profileImage),
+          transactions: user.transactions && user.transactions.length > 15
+            ? user.transactions.slice(0, 15)
+            : user.transactions
+        };
+      }
+      localStorage.setItem('naira9ja_users', JSON.stringify(pruned));
+    } catch (err2) {
+      console.warn('Storage still near limit. Applying minimal users cache...');
+      try {
+        // Tier 2: Retain core account parameters and top 5 transactions without heavy strings
+        const minimal: Record<string, User> = {};
+        for (const [key, user] of Object.entries(usersMap)) {
+          if (!user) continue;
+          minimal[key] = {
+            name: user.name,
+            email: user.email,
+            balance: user.balance,
+            level: user.level,
+            isBanned: user.isBanned,
+            adminMessage: user.adminMessage,
+            activeNairaCode: user.activeNairaCode,
+            deactivationDate: user.deactivationDate,
+            imminentDeactivationExpiry: user.imminentDeactivationExpiry,
+            attendedByAdmin: user.attendedByAdmin,
+            transactions: user.transactions ? user.transactions.slice(0, 5) : []
+          };
+        }
+        localStorage.setItem('naira9ja_users', JSON.stringify(minimal));
+      } catch (err3) {
+        console.warn('Notice: LocalStorage device quota reached; in-memory state remains synchronized.', err3);
+      }
+    }
+  }
+};
+
+/**
  * Save user to Firestore
  */
 export const saveUserToFirestore = async (user: User): Promise<void> => {
@@ -25,7 +82,7 @@ export const saveUserToFirestore = async (user: User): Promise<void> => {
     const cleanUser = JSON.parse(JSON.stringify(user));
     await setDoc(userRef, cleanUser, { merge: true });
   } catch (err) {
-    console.error('Error saving user to Firestore:', err);
+    console.warn('Notice saving user to Firestore:', err);
   }
 };
 
@@ -51,10 +108,10 @@ export const subscribeToUsers = (
         const stored = localStorage.getItem('naira9ja_users');
         const localUsersMap: Record<string, User> = stored ? JSON.parse(stored) : {};
         const merged = { ...localUsersMap, ...firestoreUsers };
-        localStorage.setItem('naira9ja_users', JSON.stringify(merged));
+        safeSaveUsersToLocalStorage(merged);
         callback(merged);
       } catch (e) {
-        console.error('Error merging users to localStorage:', e);
+        console.warn('Notice merging users into local cache:', e);
         callback(firestoreUsers);
       }
     },
@@ -101,7 +158,7 @@ export const savePaymentSubmissionToFirestore = async (
       }
     }
   } catch (err) {
-    console.error('Error saving payment submission to Firestore:', err);
+    console.warn('Notice saving payment submission to Firestore:', err);
   }
 };
 
@@ -174,7 +231,7 @@ export const subscribeToPaymentSubmissions = (
       try {
         localStorage.setItem('naira9ja_payment_submissions', JSON.stringify(merged));
       } catch (e) {
-        console.warn('LocalStorage quota exceeded in firestoreService sync. Applying fallback pruning...');
+        console.warn('LocalStorage quota reached in submissions sync. Applying safe pruning...');
         try {
           const pruned = merged.map((sub, idx) => {
             if (sub.status !== 'pending' || idx > 5) {
@@ -224,7 +281,7 @@ export const saveAppSettingsToFirestore = async (
     await setDoc(settingsRef, cleanSettings, { merge: true });
     saveAppSettings(settings);
   } catch (err) {
-    console.error('Error saving app settings to Firestore:', err);
+    console.warn('Notice saving app settings to Firestore:', err);
   }
 };
 

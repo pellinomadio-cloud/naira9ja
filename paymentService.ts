@@ -1,5 +1,5 @@
 import { PaymentSubmission, PaymentType, PaymentStatus, User, NairaCodeData } from './types';
-import { savePaymentSubmissionToFirestore, saveUserToFirestore } from './firestoreService';
+import { savePaymentSubmissionToFirestore, saveUserToFirestore, safeSaveUsersToLocalStorage } from './firestoreService';
 
 const STORAGE_KEY = 'naira9ja_payment_submissions';
 
@@ -38,7 +38,7 @@ export const savePaymentSubmissions = (submissions: PaymentSubmission[]): void =
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(minimal));
       } catch (e3) {
-        console.error('Critical: LocalStorage quota exceeded for payment submissions:', e3);
+        console.warn('Notice: LocalStorage device quota limit reached for payment submissions cache.', e3);
       }
     }
   }
@@ -191,7 +191,7 @@ export const approvePaymentSubmission = (
       targetUser.attendedByAdmin = true;
       targetUser.adminMessage = message;
       usersMap[matchedKey || targetEmailKey] = targetUser;
-      localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+      safeSaveUsersToLocalStorage(usersMap);
       saveUserToFirestore(targetUser);
 
       if (onUserUpdateCallback) {
@@ -253,7 +253,7 @@ export const declinePaymentSubmission = (
       targetUser.attendedByAdmin = true;
       targetUser.adminMessage = `Your payment submission of ₦${sub.amount.toLocaleString()} for ${sub.itemDescription} was DECLINED by Service.\nReason: ${reason}`;
       usersMap[matchedKey || targetEmailKey] = targetUser;
-      localStorage.setItem('naira9ja_users', JSON.stringify(usersMap));
+      safeSaveUsersToLocalStorage(usersMap);
       saveUserToFirestore(targetUser);
 
       if (onUserUpdateCallback) {

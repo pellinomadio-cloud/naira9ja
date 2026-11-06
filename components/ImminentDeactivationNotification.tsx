@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 
@@ -30,18 +29,18 @@ const ImminentDeactivationNotification: React.FC<ImminentDeactivationNotificatio
   }, [expiryDate]);
 
   return (
-    <div className="bg-black rounded-xl p-3 text-white shadow-lg mb-3 animate-pulse border-2 border-gold">
+    <div className="bg-white rounded-2xl p-3 text-slate-900 shadow-sm shadow-rose-500/10 mb-2.5 animate-pulse border-2 border-rose-400">
       <div className="flex items-center justify-between mb-1">
          <div className="flex items-center space-x-1.5">
-             <Icons.AlertTriangle size={16} className="text-gold" />
-             <span className="text-xs font-bold uppercase tracking-tight text-gold">Deactivation Imminent</span>
+             <Icons.AlertTriangle size={15} className="text-rose-600" />
+             <span className="text-xs font-black uppercase tracking-tight text-rose-600">Deactivation Imminent</span>
          </div>
-         <div className="bg-gold px-2 py-0.5 rounded text-sm font-mono font-bold text-black border border-gold">
+         <div className="bg-rose-100 px-2 py-0.5 rounded-lg text-xs font-mono font-black text-rose-800 border border-rose-300">
             {timeLeft}
          </div>
       </div>
-      <p className="text-[11px] text-center font-medium leading-tight bg-gold/10 p-1.5 rounded border border-gold/20">
-         To prevent closure, pay <span className="font-bold text-gold">₦10,000</span>. Click the <span className="font-extrabold text-black bg-gold px-1.5 py-0.5 rounded text-[10px]">To Naira</span> button.
+      <p className="text-[11px] text-center font-medium leading-tight bg-rose-50 p-2 rounded-xl border border-rose-200 text-slate-800">
+         To prevent closure, pay <strong className="text-rose-600 font-bold">₦10,000</strong>. Use the activation button on your dashboard.
       </p>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { UpgradeLevelPlan } from '../types';
@@ -18,7 +17,7 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
   userName = 'User',
   selectedPlan = {
     level: 2,
-    name: 'Level 2 • Scholar',
+    name: 'Tier 2 • Scholar',
     price: 6000,
     priceFormatted: '₦6,000',
     features: []
@@ -45,7 +44,7 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsFetching(false);
-    }, 1200);
+    }, 800);
 
     // Check if user already has a pending payment submission
     const pending = getUserPendingSubmission(userEmail);
@@ -81,7 +80,6 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
   };
 
   const handleVerify = () => {
-    // Check if pending already exists
     const pending = getUserPendingSubmission(userEmail);
     if (pending) {
       setStatus('pending_exist');
@@ -115,98 +113,98 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
         setStatus('pending_exist');
         setNoticeMessage(result.message);
       }
-    }, 1500);
+    }, 1200);
   };
 
   if (isFetching) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-in fade-in duration-500">
-        <div className="w-14 h-14 border-4 border-purple-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(168,85,247,0.4)]"></div>
-        <p className="text-purple-400 font-bold text-xs uppercase tracking-widest animate-pulse">
-          Generating Company Account Details...
+      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-3 animate-in fade-in duration-500">
+        <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-blue-600 font-bold text-xs uppercase tracking-wider animate-pulse">
+          Loading Company Account Details...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+    <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       
       {/* Warning Notice */}
-      <div className={`bg-rose-950/80 border border-rose-800/60 text-rose-300 p-3 rounded-2xl text-center font-bold text-xs transition-all duration-500 ${showWarning ? 'opacity-100 scale-100' : 'opacity-70 scale-98'}`}>
-        ⚠️ Transfers from OPay are restricted. Please use Moniepoint, PalmPay, Kuda, or standard commercial bank apps to pay.
+      <div className={`bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-2xl text-center font-bold text-xs transition-all duration-500 ${showWarning ? 'opacity-100 scale-100' : 'opacity-80 scale-98'}`}>
+        ⚠️ Transfers from OPay are restricted. Please use Moniepoint, PalmPay, Kuda, or commercial bank apps to pay.
       </div>
 
       {/* Pending Submission Banner if User has already submitted */}
       {status === 'pending_exist' && (
-        <div className="bg-amber-950/90 border border-amber-600/80 p-5 rounded-3xl space-y-2 text-center animate-in zoom-in-95">
-          <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto border border-amber-500/40">
-            <Icons.Sync className="animate-spin" size={24} />
+        <div className="bg-amber-50 border border-amber-300 p-4 rounded-3xl space-y-1.5 text-center animate-in zoom-in-95">
+          <div className="w-10 h-10 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto border border-amber-300">
+            <Icons.Sync className="animate-spin" size={20} />
           </div>
-          <h4 className="font-black text-amber-300 text-base">Payment Verification Pending</h4>
-          <p className="text-xs text-amber-200/90 leading-relaxed font-medium">
-            You already have an active payment proof submission submitted to Service awaiting approval. You cannot upload a new payment proof until the current submission is processed.
+          <h4 className="font-black text-amber-900 text-sm">Payment Verification Pending</h4>
+          <p className="text-xs text-amber-800 leading-relaxed font-medium">
+            You already have an active payment proof submission submitted to Service awaiting approval. Your Tier 2 upgrade and pending withdrawal will be approved shortly.
           </p>
         </div>
       )}
 
       {/* Selected Plan Summary */}
-      <div className="bg-[#12142e] p-5 rounded-2xl flex justify-between items-center border border-[#212552] shadow-xl">
+      <div className="bg-white p-4 rounded-2xl flex justify-between items-center border border-pink-200 shadow-sm shadow-pink-500/5">
         <div>
-          <p className="text-[10px] text-purple-400 font-extrabold uppercase tracking-widest">Selected Upgrade Plan</p>
-          <h3 className="text-lg font-black text-white mt-0.5">{selectedPlan.name}</h3>
-          <p className="text-xs text-slate-400">Target Level: Level {selectedPlan.level}</p>
+          <p className="text-[9px] text-blue-600 font-black uppercase tracking-wider">Selected Upgrade Plan</p>
+          <h3 className="text-base font-black text-slate-900 mt-0.5">{selectedPlan.name}</h3>
+          <p className="text-xs text-slate-500 font-medium">Tier {selectedPlan.level} Upgrade</p>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-black text-white">{selectedPlan.priceFormatted}</p>
-          <span className="text-[10px] text-slate-400 font-medium">Company Account Transfer</span>
+          <p className="text-xl font-black text-slate-900">{selectedPlan.priceFormatted}</p>
+          <span className="text-[10px] text-slate-500 font-medium">Bank Transfer</span>
         </div>
       </div>
 
       {/* Account Details Section */}
-      <div className="space-y-3">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Step 1: Transfer {selectedPlan.priceFormatted} to Company Account</p>
+      <div className="space-y-2">
+        <p className="text-xs font-bold text-slate-700 uppercase tracking-wider text-center">Step 1: Transfer {selectedPlan.priceFormatted} to Company Account</p>
         
-        <div className="bg-[#12142e] rounded-3xl p-6 shadow-2xl border border-[#212552] space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
+        <div className="bg-white rounded-3xl p-5 shadow-sm shadow-pink-500/5 border border-pink-200 space-y-3 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-black"></div>
           
-          <div className="space-y-3">
-            <div className="flex justify-between items-center border-b border-[#1e2247] pb-3">
-              <span className="text-xs text-slate-400 uppercase font-bold">Account Number</span>
+          <div className="space-y-2.5">
+            <div className="flex justify-between items-center border-b border-pink-100 pb-2">
+              <span className="text-xs text-slate-500 uppercase font-bold">Account Number</span>
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-black text-white tracking-widest">{accountNumber}</span>
+                <span className="text-lg font-black text-slate-900 tracking-wider">{accountNumber}</span>
                 <button 
                   onClick={handleCopy}
-                  className={`p-2 rounded-xl transition-all ${copied ? 'bg-emerald-600 text-white' : 'bg-[#1e2247] text-purple-300 hover:bg-[#282d5c]'}`}
+                  className={`p-1.5 rounded-lg transition-all ${copied ? 'bg-emerald-600 text-white' : 'bg-pink-50 text-slate-700 hover:bg-pink-100'}`}
                 >
-                  {copied ? <Icons.Check size={16} /> : <Icons.Copy size={16} />}
+                  {copied ? <Icons.Check size={14} /> : <Icons.Copy size={14} className="text-blue-600" />}
                 </button>
               </div>
             </div>
             
-            <div className="flex justify-between items-center border-b border-[#1e2247] pb-3">
-              <span className="text-xs text-slate-400 uppercase font-bold">Bank Name</span>
-              <span className="text-sm font-black text-white uppercase tracking-tight">{settings.companyBankName}</span>
+            <div className="flex justify-between items-center border-b border-pink-100 pb-2">
+              <span className="text-xs text-slate-500 uppercase font-bold">Bank Name</span>
+              <span className="text-xs font-black text-slate-900 uppercase">{settings.companyBankName}</span>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-xs text-slate-400 uppercase font-bold">Account Name</span>
-              <span className="text-xs font-black text-emerald-400 uppercase tracking-tight">{settings.companyAccountName}</span>
+              <span className="text-xs text-slate-500 uppercase font-bold">Account Name</span>
+              <span className="text-xs font-black text-slate-900 uppercase">{settings.companyAccountName}</span>
             </div>
           </div>
           
-          <div className="bg-[#181a3c] p-3 rounded-xl flex items-start space-x-2 border border-[#2a2f66]">
-            <Icons.AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-[10px] text-slate-300 leading-normal font-medium">
-              Transfer exactly <strong className="text-white">{selectedPlan.priceFormatted}</strong> to upgrade your account to <strong className="text-purple-300">Level {selectedPlan.level}</strong>. Keep your transaction receipt for verification.
+          <div className="bg-pink-50/70 p-2.5 rounded-xl flex items-start space-x-2 border border-pink-200">
+            <Icons.AlertTriangle size={15} className="text-rose-600 shrink-0 mt-0.5" />
+            <p className="text-[10px] text-slate-700 leading-normal font-medium">
+              Transfer exactly <strong className="text-slate-950">{selectedPlan.priceFormatted}</strong> to activate <strong className="text-rose-600">Tier {selectedPlan.level}</strong>. Keep your transaction receipt for verification.
             </p>
           </div>
         </div>
       </div>
 
       {/* Proof Upload Section */}
-      <div className="space-y-3">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Step 2: Upload Payment Proof</p>
+      <div className="space-y-2">
+        <p className="text-xs font-bold text-slate-700 uppercase tracking-wider text-center">Step 2: Upload Payment Proof Receipt</p>
         
         <div className="relative">
           <input 
@@ -219,30 +217,30 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
           />
           <label 
             htmlFor="proof-upload"
-            className={`w-full py-6 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all ${
+            className={`w-full py-5 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-1.5 cursor-pointer transition-all ${
               status === 'pending_exist'
-                ? 'border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-60'
+                ? 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
                 : proofFile 
-                ? 'border-emerald-500/80 bg-emerald-950/30' 
-                : 'border-[#2a2f66] bg-[#12142e] hover:border-purple-500/50'
+                ? 'border-emerald-500 bg-emerald-50/50' 
+                : 'border-pink-300 bg-white hover:border-blue-500 shadow-2xs'
             }`}
           >
             {proofFile ? (
               <>
-                <div className="w-12 h-12 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center justify-center">
-                  <Icons.CheckCircle size={28} />
+                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 flex items-center justify-center">
+                  <Icons.CheckCircle size={22} />
                 </div>
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider px-2 text-center truncate max-w-xs">
-                  Receipt Selected: {proofFile.name}
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider px-2 text-center truncate max-w-xs">
+                  Receipt: {proofFile.name}
                 </span>
               </>
             ) : (
               <>
-                <div className="w-12 h-12 rounded-full bg-[#1e2247] text-purple-400 flex items-center justify-center">
-                  <Icons.Upload size={24} />
+                <div className="w-10 h-10 rounded-full bg-pink-100 text-blue-600 flex items-center justify-center">
+                  <Icons.Upload size={20} />
                 </div>
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Click to upload payment receipt</span>
-                <span className="text-[10px] text-slate-400">JPEG, PNG, or PDF screenshot</span>
+                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Click to upload payment receipt</span>
+                <span className="text-[10px] text-slate-500">Screenshot JPEG or PNG</span>
               </>
             )}
           </label>
@@ -251,48 +249,47 @@ const UpgradePayment: React.FC<UpgradePaymentProps> = ({
 
       {/* Status Alert */}
       {status === 'success' && (
-        <div className="bg-emerald-950/90 border border-emerald-800 p-4 rounded-2xl text-center space-y-1 text-emerald-300 animate-in fade-in">
-          <div className="flex items-center justify-center space-x-2">
-            <Icons.CheckCircle size={22} />
+        <div className="bg-emerald-50 border border-emerald-300 p-3.5 rounded-2xl text-center space-y-1 text-emerald-900 animate-in fade-in">
+          <div className="flex items-center justify-center space-x-1.5">
+            <Icons.CheckCircle size={18} className="text-emerald-600" />
             <span className="text-xs font-extrabold uppercase">Payment Proof Submitted to Service!</span>
           </div>
-          <p className="text-[11px] text-emerald-200/90">{noticeMessage || 'Awaiting admin review and approval.'}</p>
+          <p className="text-[11px] text-emerald-800">{noticeMessage || 'Awaiting admin review and approval.'}</p>
         </div>
       )}
 
-      {/* Submit Verification Button */}
-      <div className="space-y-3">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Step 3: Submit for Admin Approval</p>
+      {/* Submit Verification Button - Black with touch of blue */}
+      <div className="space-y-2 pt-1">
         <button 
           onClick={handleVerify}
           disabled={status === 'loading' || status === 'success' || status === 'pending_exist'}
-          className={`w-full py-4 rounded-2xl text-white font-black text-sm shadow-xl transition-all flex items-center justify-center space-x-2 ${
+          className={`w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 ${
             status === 'loading' || status === 'success' || status === 'pending_exist'
-              ? 'bg-slate-700/80 cursor-not-allowed text-slate-400'
-              : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 shadow-[0_4px_20px_rgba(124,58,237,0.4)]'
+              ? 'bg-slate-300 cursor-not-allowed text-slate-500'
+              : 'bg-black hover:bg-slate-900 active:scale-95 border border-blue-500/50 shadow-[0_2px_10px_rgba(37,99,235,0.25)] uppercase tracking-wider'
           }`}
         >
           {status === 'loading' ? (
             <>
-              <Icons.Sync className="animate-spin" size={18} />
-              <span className="uppercase tracking-wider">Submitting Payment Proof...</span>
+              <Icons.Sync className="animate-spin" size={16} />
+              <span>Submitting Payment Proof...</span>
             </>
           ) : status === 'pending_exist' ? (
             <>
-              <Icons.Sync size={18} />
-              <span className="uppercase tracking-wider">Submission Pending Approval</span>
+              <Icons.Sync size={16} />
+              <span>Submission Pending Approval</span>
             </>
           ) : (
             <>
-              <Icons.ShieldCheck size={20} />
-              <span className="uppercase tracking-wider">Submit Payment Verification</span>
+              <Icons.ShieldCheck size={16} className="text-blue-400" />
+              <span>Submit Payment Verification</span>
             </>
           )}
         </button>
       </div>
 
-      <div className="bg-[#12142e] p-3 rounded-xl text-center border border-[#212552]">
-        <p className="text-[10px] text-slate-400 leading-tight">
+      <div className="bg-white p-3 rounded-2xl text-center border border-pink-200">
+        <p className="text-[10px] text-slate-500 leading-tight">
           Payments are verified by Service admins against bank logs. Fake or duplicated payment receipts will result in permanent account suspension.
         </p>
       </div>

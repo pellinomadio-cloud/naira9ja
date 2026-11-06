@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Icons } from './Icons';
 
@@ -19,7 +18,7 @@ interface HeaderProps {
 
 const LEVEL_NAMES: Record<number, string> = {
   1: 'Level 1 • Beginner',
-  2: 'Level 2 • Scholar',
+  2: 'Level 2 • Scholar (Tier 2)',
   3: 'Level 3 • Master',
   4: 'Level 4 • VIP Pro'
 };
@@ -45,63 +44,63 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {showBack ? (
-        <div className="bg-[#0c0e22] px-4 py-3.5 flex items-center justify-between sticky top-0 z-50 border-b border-[#1c2048] text-white">
-          <div className="flex items-center space-x-3">
-            <button 
-              onClick={onBack} 
-              className="p-2 -ml-2 hover:bg-[#1a1d42] rounded-full transition-colors text-white"
-            >
-              <Icons.ArrowLeft size={22} />
-            </button>
-            <span className="font-bold text-white text-base tracking-wide">{pageTitle}</span>
-          </div>
+        <div className="bg-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-50 border-b border-pink-200 text-slate-900 shadow-2xs">
           <div className="flex items-center space-x-2">
             <button 
-              onClick={() => setIsSlideOpen(true)}
-              className="p-2 hover:bg-[#1a1d42] rounded-full text-slate-300"
+              onClick={onBack} 
+              className="p-1.5 -ml-1.5 hover:bg-pink-100 rounded-full transition-colors text-slate-700"
             >
-              <Icons.Menu size={22} />
+              <Icons.ArrowLeft size={18} />
+            </button>
+            <span className="font-black text-slate-900 text-sm tracking-tight">{pageTitle}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <button 
+              onClick={() => setIsSlideOpen(true)}
+              className="p-1.5 hover:bg-pink-100 rounded-full text-slate-700"
+            >
+              <Icons.Menu size={18} />
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-[#080915] px-4 pt-4 pb-2">
+        <div className="bg-transparent px-4 pt-3 pb-1">
           <div className="flex justify-between items-center">
             {/* Left Side: Hamburger & Brand */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2.5">
               <button 
                 onClick={() => setIsSlideOpen(true)}
-                className="p-2 -ml-2 text-white hover:text-purple-400 transition-colors"
+                className="p-1.5 -ml-1.5 text-slate-800 hover:text-blue-600 transition-colors"
                 title="Open Navigation Menu"
               >
-                <Icons.Menu size={26} />
+                <Icons.Menu size={20} />
               </button>
               
               <div className="flex items-center space-x-2">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-700 to-indigo-500 flex items-center justify-center text-white shadow-[0_0_15px_rgba(124,58,237,0.5)]">
-                  <Icons.GraduationCap size={22} />
+                <div className="w-7 h-7 rounded-xl bg-black border border-blue-500/50 flex items-center justify-center text-white shadow-xs">
+                  <Icons.GraduationCap size={15} className="text-blue-400" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-black text-white tracking-tight leading-none">LearnEarn</h1>
-                  <p className="text-[9px] font-bold text-indigo-300 uppercase tracking-widest mt-0.5">LEARN • EARN • GROW</p>
+                  <h1 className="text-sm font-black text-slate-900 tracking-tight leading-none">LearnEarn</h1>
+                  <p className="text-[8px] font-black text-blue-600 uppercase tracking-widest mt-0.5">LEARN • EARN • GROW</p>
                 </div>
               </div>
             </div>
 
             {/* Right Side: Notification Bell & Profile Avatar */}
             <div className="flex items-center space-x-2">
-              <button className="relative p-2 text-slate-300 hover:text-white transition-colors">
-                <Icons.Notification size={22} />
-                <span className="absolute top-1 right-1 w-4 h-4 bg-purple-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center border border-[#080915]">
-                  3
+              <button className="relative p-1.5 text-slate-600 hover:text-slate-900 transition-colors">
+                <Icons.Notification size={18} />
+                <span className="absolute top-1 right-1 w-3 h-3 bg-blue-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center">
+                  1
                 </span>
               </button>
 
               <div 
                 onClick={onNavigateProfile}
-                className="w-9 h-9 rounded-full bg-purple-600 p-0.5 border border-purple-400/50 flex items-center justify-center shadow-[0_0_10px_rgba(124,58,237,0.4)] cursor-pointer hover:scale-105 transition-transform"
+                className="w-7 h-7 rounded-full bg-white p-0.5 border border-pink-300 ring-1 ring-blue-500/30 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
               >
-                <div className="w-full h-full rounded-full overflow-hidden bg-purple-900 flex items-center justify-center">
+                <div className="w-full h-full rounded-full overflow-hidden bg-pink-100 flex items-center justify-center">
                   {profileImage ? (
                     <img 
                       src={profileImage} 
@@ -110,7 +109,7 @@ const Header: React.FC<HeaderProps> = ({
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <Icons.User size={18} className="text-white" />
+                    <Icons.User size={13} className="text-slate-800" />
                   )}
                 </div>
               </div>
@@ -125,17 +124,17 @@ const Header: React.FC<HeaderProps> = ({
           {/* Backdrop */}
           <div 
             onClick={() => setIsSlideOpen(false)}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200"
           />
 
           {/* Drawer Content Panel */}
-          <div className="relative w-4/5 max-w-xs bg-[#0e1027] border-r border-[#222758] text-white h-full flex flex-col justify-between p-5 z-10 shadow-2xl animate-in slide-in-from-left duration-300">
+          <div className="relative w-4/5 max-w-xs bg-white border-r border-pink-200 text-slate-900 h-full flex flex-col justify-between p-4 z-10 shadow-2xl animate-in slide-in-from-left duration-200">
             <div>
               {/* Header inside drawer */}
-              <div className="flex justify-between items-start pb-5 border-b border-[#1e2350]">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-full bg-purple-600 p-0.5 border-2 border-purple-400/50 flex items-center justify-center shadow-md">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-purple-900 flex items-center justify-center">
+              <div className="flex justify-between items-start pb-3 border-b border-pink-100">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-9 h-9 rounded-full bg-pink-100 p-0.5 border border-pink-300 flex items-center justify-center shadow-xs">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
                       {profileImage ? (
                         <img 
                           src={profileImage} 
@@ -144,14 +143,14 @@ const Header: React.FC<HeaderProps> = ({
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <Icons.User size={24} className="text-white" />
+                        <Icons.User size={16} className="text-slate-800" />
                       )}
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-base truncate max-w-[130px]">{userName}</h3>
-                    <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-[#1b1f48] border border-[#2d3478] text-[10px] font-semibold text-purple-300 mt-0.5">
-                      <span className="text-amber-400">⭐</span>
+                    <h3 className="font-bold text-slate-900 text-xs truncate max-w-[120px]">{userName}</h3>
+                    <div className="inline-flex items-center space-x-1 px-2 py-0.2 rounded-full bg-pink-100 border border-pink-200 text-[9px] font-bold text-slate-700 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                       <span>{levelName}</span>
                     </div>
                   </div>
@@ -159,27 +158,27 @@ const Header: React.FC<HeaderProps> = ({
 
                 <button 
                   onClick={() => setIsSlideOpen(false)}
-                  className="p-2 rounded-full bg-[#181c42] text-slate-300 hover:text-white hover:bg-[#23295e] transition-colors"
+                  className="p-1 rounded-full bg-pink-50 text-slate-500 hover:text-slate-900 transition-colors"
                 >
-                  <Icons.X size={18} />
+                  <Icons.X size={15} />
                 </button>
               </div>
 
               {/* Navigation Menu List */}
-              <div className="mt-6 space-y-2">
+              <div className="mt-4 space-y-1.5">
                 <button
                   onClick={() => {
                     setIsSlideOpen(false);
                     onNavigateHome?.();
                   }}
-                  className="w-full flex items-center space-x-3.5 p-3 rounded-2xl bg-[#141838]/60 hover:bg-[#1f2552] border border-[#202758] text-white transition-all text-left"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-2xl bg-pink-50/60 hover:bg-pink-100 border border-pink-200 text-slate-800 transition-all text-left"
                 >
-                  <div className="p-2 rounded-xl bg-indigo-900/60 text-indigo-400">
-                    <Icons.Home size={20} />
+                  <div className="p-1.5 rounded-xl bg-white text-blue-600 border border-pink-200">
+                    <Icons.Home size={16} />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">Home Dashboard</span>
-                    <span className="text-[10px] text-slate-400">Main overview & activities</span>
+                    <span className="font-bold text-xs block">Home Dashboard</span>
+                    <span className="text-[9px] text-slate-500">Main overview & activities</span>
                   </div>
                 </button>
 
@@ -188,14 +187,14 @@ const Header: React.FC<HeaderProps> = ({
                     setIsSlideOpen(false);
                     onNavigateProfile?.();
                   }}
-                  className="w-full flex items-center space-x-3.5 p-3 rounded-2xl bg-[#141838]/60 hover:bg-[#1f2552] border border-[#202758] text-white transition-all text-left"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-2xl bg-pink-50/60 hover:bg-pink-100 border border-pink-200 text-slate-800 transition-all text-left"
                 >
-                  <div className="p-2 rounded-xl bg-purple-900/60 text-purple-400">
-                    <Icons.User size={20} />
+                  <div className="p-1.5 rounded-xl bg-white text-blue-600 border border-pink-200">
+                    <Icons.User size={16} />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">My Profile</span>
-                    <span className="text-[10px] text-slate-400">View and edit account profile</span>
+                    <span className="font-bold text-xs block">My Profile</span>
+                    <span className="text-[9px] text-slate-500">View and edit account profile</span>
                   </div>
                 </button>
 
@@ -204,14 +203,14 @@ const Header: React.FC<HeaderProps> = ({
                     setIsSlideOpen(false);
                     onNavigateWithdraw?.();
                   }}
-                  className="w-full flex items-center space-x-3.5 p-3 rounded-2xl bg-[#141838]/60 hover:bg-[#1f2552] border border-[#202758] text-white transition-all text-left"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-2xl bg-pink-50/60 hover:bg-pink-100 border border-pink-200 text-slate-800 transition-all text-left"
                 >
-                  <div className="p-2 rounded-xl bg-emerald-900/60 text-emerald-400">
-                    <Icons.Send size={20} />
+                  <div className="p-1.5 rounded-xl bg-white text-blue-600 border border-pink-200">
+                    <Icons.Send size={16} />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">Withdraw Funds</span>
-                    <span className="text-[10px] text-slate-400">Transfer balance to bank account</span>
+                    <span className="font-bold text-xs block">Withdraw Funds</span>
+                    <span className="text-[9px] text-slate-500">Transfer balance to bank account</span>
                   </div>
                 </button>
 
@@ -220,52 +219,52 @@ const Header: React.FC<HeaderProps> = ({
                     setIsSlideOpen(false);
                     onNavigateUpgrade?.();
                   }}
-                  className="w-full flex items-center space-x-3.5 p-3 rounded-2xl bg-[#141838]/60 hover:bg-[#1f2552] border border-[#202758] text-white transition-all text-left"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-2xl bg-pink-50/60 hover:bg-pink-100 border border-pink-200 text-slate-800 transition-all text-left"
                 >
-                  <div className="p-2 rounded-xl bg-amber-900/60 text-amber-400">
-                    <Icons.TrendingUp size={20} />
+                  <div className="p-1.5 rounded-xl bg-white text-blue-600 border border-pink-200">
+                    <Icons.TrendingUp size={16} />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">Upgrade Level</span>
-                    <span className="text-[10px] text-slate-400">Level 2, Level 3 & Level 4 VIP</span>
+                    <span className="font-bold text-xs block">Upgrade Tier / Level</span>
+                    <span className="text-[9px] text-slate-500">Tier 2, Level 3 & Level 4 VIP</span>
                   </div>
                 </button>
 
-                {/* Red Service Button */}
+                {/* Service Button */}
                 <button
                   onClick={() => {
                     setIsSlideOpen(false);
                     onNavigateAdmin?.();
                   }}
-                  className="w-full flex items-center space-x-3.5 p-3 rounded-2xl bg-gradient-to-r from-red-950/90 to-rose-950/90 hover:from-red-900 hover:to-rose-900 border border-red-600/80 text-white transition-all text-left shadow-[0_0_15px_rgba(225,29,72,0.35)]"
+                  className="btn-black-blue w-full flex items-center space-x-3 p-2.5 rounded-2xl text-left"
                 >
-                  <div className="p-2 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-md">
-                    <Icons.ShieldCheck size={20} />
+                  <div className="p-1.5 rounded-xl bg-slate-900 text-blue-400 border border-blue-500/40">
+                    <Icons.ShieldCheck size={16} />
                   </div>
                   <div>
-                    <span className="font-extrabold text-sm block text-red-300">Service</span>
-                    <span className="text-[10px] text-red-200/80">System Portal • Passkey required</span>
+                    <span className="font-black text-xs block text-white">Service</span>
+                    <span className="text-[9px] text-slate-400">System Portal • Passkey</span>
                   </div>
                 </button>
               </div>
             </div>
 
             {/* Footer inside drawer */}
-            <div className="pt-4 border-t border-[#1e2350] space-y-3">
+            <div className="pt-3 border-t border-pink-100 space-y-2">
               {onLogout && (
                 <button
                   onClick={() => {
                     setIsSlideOpen(false);
                     onLogout();
                   }}
-                  className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/50 text-rose-300 font-bold text-xs transition-colors"
+                  className="w-full flex items-center justify-center space-x-1.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold text-xs transition-colors"
                 >
-                  <Icons.LogOut size={16} />
+                  <Icons.LogOut size={14} />
                   <span>Log Out</span>
                 </button>
               )}
 
-              <p className="text-[10px] text-slate-500 text-center font-mono">LearnEarn v2.4 • Secure Account</p>
+              <p className="text-[9px] text-slate-400 text-center font-mono">LearnEarn Secure Account</p>
             </div>
           </div>
         </div>
@@ -275,5 +274,3 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
-
-

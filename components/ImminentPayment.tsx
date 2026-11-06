@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { useAppSettings } from '../appSettings';
@@ -19,7 +18,6 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
 
   const settings = useAppSettings();
 
-  // If email not passed, try getting current logged in user from localStorage
   const activeEmail = userEmail || (() => {
     try {
       const stored = localStorage.getItem('naira9ja_users');
@@ -98,70 +96,70 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
         setStatus('pending_exist');
         setNoticeMessage(result.message);
       }
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="px-4 py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+    <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       <div className="flex items-center space-x-2">
-        <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-800">
-             <Icons.ArrowLeft size={24} className="text-white" />
+        <button onClick={onBack} className="p-1.5 rounded-full hover:bg-pink-100 transition-colors">
+             <Icons.ArrowLeft size={20} className="text-slate-800" />
         </button>
-        <h2 className="text-xl font-bold text-white">Imminent Activation</h2>
+        <h2 className="text-base font-black text-slate-900">Account Activation</h2>
       </div>
 
       {status === 'pending_exist' && (
-        <div className="bg-amber-950/90 border border-amber-600/80 p-5 rounded-3xl space-y-2 text-center animate-in zoom-in-95">
-          <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto border border-amber-500/40">
-            <Icons.Sync className="animate-spin" size={24} />
+        <div className="bg-amber-50 border border-amber-300 p-4 rounded-3xl space-y-1.5 text-center animate-in zoom-in-95">
+          <div className="w-10 h-10 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto border border-amber-300">
+            <Icons.Sync className="animate-spin" size={20} />
           </div>
-          <h4 className="font-black text-amber-300 text-base">Activation Verification Pending</h4>
-          <p className="text-xs text-amber-200/90 leading-relaxed font-medium">
-            You already submitted an activation payment proof to Service. Your request is awaiting admin review and approval. You cannot upload a new payment proof until the current submission is processed.
+          <h4 className="font-black text-amber-900 text-sm">Activation Verification Pending</h4>
+          <p className="text-xs text-amber-800 leading-relaxed font-medium">
+            You already submitted an activation payment proof to Service. Your request is awaiting admin review and approval.
           </p>
         </div>
       )}
 
-      <div className="bg-gold/10 p-4 rounded-xl border border-gold/20 shadow-sm">
-        <h3 className="font-bold text-gold mb-2 flex items-center">
-            <Icons.ShieldCheck className="mr-2" size={18} />
+      <div className="bg-white p-3.5 rounded-2xl border border-pink-200 shadow-sm shadow-pink-500/5">
+        <h3 className="font-bold text-xs text-rose-600 mb-1 flex items-center">
+            <Icons.ShieldCheck className="mr-1.5" size={15} />
             Mandatory Activation
         </h3>
-        <p className="text-sm text-gray-300 leading-relaxed font-medium">
-            New users and subscribers must complete the imminent payment to secure their account status. This is a one-time verification requirement.
+        <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            New users must complete activation payment to secure their account status.
         </p>
       </div>
 
       {/* PAY Now Section */}
-      <div className="bg-gray-900 rounded-2xl p-6 shadow-xl border border-gray-800 space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1.5 h-full bg-gold"></div>
+      <div className="bg-white rounded-3xl p-5 shadow-sm shadow-pink-500/5 border border-pink-200 space-y-3 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1.5 h-full bg-black"></div>
         
-        <div className="text-center space-y-1">
-            <p className="text-xs font-black text-gold uppercase tracking-widest">Verification Amount</p>
-            <p className="text-3xl font-black text-white">₦10,000</p>
+        <div className="text-center space-y-0.5">
+            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Verification Amount</p>
+            <p className="text-2xl font-black text-slate-900">₦10,000</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-left border-t border-gray-800 pt-4">
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Bank Name</p>
-            <p className="text-sm font-black text-white">{settings.companyBankName}</p>
+        <div className="grid grid-cols-2 gap-2 text-left border-t border-pink-100 pt-3">
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-bold text-slate-400 uppercase">Bank Name</p>
+            <p className="text-xs font-black text-slate-900">{settings.companyBankName}</p>
           </div>
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Account Name</p>
-            <p className="text-sm font-black text-white">{settings.companyAccountName}</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-bold text-slate-400 uppercase">Account Name</p>
+            <p className="text-xs font-black text-slate-900">{settings.companyAccountName}</p>
           </div>
           <div className="col-span-2 space-y-1">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Account Number</p>
-            <div className="flex items-center justify-between bg-black p-3 rounded-xl border border-gray-800">
-              <p className="text-xl font-black text-gold tracking-wider">{settings.companyAccountNumber}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase">Account Number</p>
+            <div className="flex items-center justify-between bg-pink-50/70 p-2.5 rounded-xl border border-pink-200">
+              <p className="text-base font-black text-slate-900 tracking-wider">{settings.companyAccountNumber}</p>
               <button 
                 onClick={() => {
                   navigator.clipboard.writeText(settings.companyAccountNumber);
                   alert("Account number copied to clipboard!");
                 }}
-                className="p-2 bg-gold/10 text-gold rounded-lg active:scale-90 transition-transform"
+                className="p-1.5 bg-white text-blue-600 border border-pink-200 rounded-lg active:scale-90 transition-transform"
               >
-                <Icons.Copy size={18} />
+                <Icons.Copy size={14} />
               </button>
             </div>
           </div>
@@ -169,26 +167,22 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
 
         <button 
           onClick={handlePayNow}
-          className="w-full py-5 bg-gold hover:bg-gold-dark text-black font-black text-xl rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center space-x-3 group"
+          className="w-full py-2.5 px-4 bg-black hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-[0_2px_10px_rgba(37,99,235,0.25)] border border-blue-500/50 transition-all active:scale-95 flex items-center justify-center space-x-2 uppercase tracking-wider"
         >
-          <Icons.Banknote size={28} className="group-hover:rotate-6 transition-transform" />
-          <span className="uppercase tracking-widest">Copy Details</span>
+          <Icons.Banknote size={15} className="text-blue-400" />
+          <span>Copy Details</span>
         </button>
         
-        <p className="text-[10px] text-gray-500 text-center font-medium italic">Make payment of ₦10,000 to the account above</p>
-        
-        <div className="bg-red-900/20 p-3 rounded-lg border border-red-800 text-center">
-          <p className="text-[10px] text-red-400 font-bold leading-tight uppercase tracking-tight">
-            ⚠️ DO NOT USE OPAY TO PAY FOR SUBSCRIPTION. <br/>
-            PALMPAY AND ANY OTHER BANK IS ALLOWED.
+        <div className="bg-rose-50 p-2.5 rounded-xl border border-rose-200 text-center">
+          <p className="text-[10px] text-rose-700 font-bold leading-tight uppercase">
+            ⚠️ DO NOT USE OPAY. PALMPAY AND OTHER BANKS ARE ALLOWED.
           </p>
         </div>
       </div>
 
-      <div className="space-y-4 pt-2 border-t border-gray-800">
-          {/* Payment Proof Upload */}
-          <div className="space-y-3">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 text-center">Step 2: Upload Payment Proof</p>
+      <div className="space-y-3 pt-1 border-t border-pink-100">
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-wider text-center">Step 2: Upload Payment Proof</p>
             <div className="relative">
               <input 
                 type="file" 
@@ -200,47 +194,45 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
               />
               <label 
                 htmlFor="imminent-proof-upload"
-                className={`w-full py-4 border-2 border-dashed rounded-xl flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all ${
+                className={`w-full py-4 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-1.5 cursor-pointer transition-all ${
                   status === 'pending_exist' 
-                    ? 'border-gray-800 bg-gray-900/50 opacity-50 cursor-not-allowed'
-                    : paymentProof ? 'border-green-500 bg-green-900/20' : 'border-gray-800 hover:border-gold'
+                    ? 'border-slate-200 bg-slate-50 opacity-50 cursor-not-allowed'
+                    : paymentProof ? 'border-emerald-500 bg-emerald-50/50' : 'border-pink-300 bg-white hover:border-blue-500'
                 }`}
               >
                 {paymentProof ? (
                   <>
-                    <Icons.CheckCircle className="text-green-500" size={24} />
-                    <span className="text-xs font-bold text-green-400 uppercase">Proof Uploaded</span>
+                    <Icons.CheckCircle className="text-emerald-600" size={20} />
+                    <span className="text-xs font-bold text-emerald-700 uppercase">Proof Uploaded</span>
                   </>
                 ) : (
                   <>
-                    <Icons.Upload className="text-gray-500" size={24} />
-                    <span className="text-xs font-bold text-gray-500 uppercase">Click to Upload Receipt</span>
+                    <Icons.Upload className="text-blue-500" size={20} />
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Click to Upload Receipt</span>
                   </>
                 )}
               </label>
             </div>
           </div>
 
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 text-center">Step 3: Confirm Activation</p>
-
           {status === 'success' && (
-            <div className="bg-emerald-950/90 border border-emerald-800 p-4 rounded-xl text-center space-y-1 text-emerald-300 animate-in fade-in">
-              <div className="flex items-center justify-center space-x-2">
-                <Icons.CheckCircle size={22} />
+            <div className="bg-emerald-50 border border-emerald-300 p-3 rounded-2xl text-center space-y-0.5 text-emerald-900 animate-in fade-in">
+              <div className="flex items-center justify-center space-x-1.5">
+                <Icons.CheckCircle size={16} className="text-emerald-600" />
                 <span className="text-xs font-extrabold uppercase">Payment Proof Submitted!</span>
               </div>
-              <p className="text-[11px] text-emerald-200">{noticeMessage}</p>
+              <p className="text-[11px] text-emerald-800">{noticeMessage}</p>
             </div>
           )}
 
           <button 
             onClick={handleSubmit} 
             disabled={status === 'loading' || status === 'success' || status === 'pending_exist'}
-            className="w-full py-4 bg-gold hover:bg-gold-dark disabled:bg-gray-800 text-black disabled:text-gray-500 font-black rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 active:scale-95 uppercase tracking-widest"
+            className="w-full py-2.5 px-4 bg-black hover:bg-slate-900 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-[0_2px_10px_rgba(37,99,235,0.25)] border border-blue-500/50 transition-all flex items-center justify-center space-x-2 active:scale-95 uppercase tracking-wider"
           >
               {status === 'loading' ? (
                   <>
-                    <Icons.Sync className="animate-spin" size={20} />
+                    <Icons.Sync className="animate-spin" size={16} />
                     <span>Submitting Proof...</span>
                   </>
               ) : status === 'pending_exist' ? (
@@ -249,13 +241,6 @@ const ImminentPayment: React.FC<ImminentPaymentProps> = ({ userEmail = '', userN
                   <span>Verify Payment</span>
               )}
           </button>
-
-          <div className="bg-gray-900 p-3 rounded-lg text-center border border-gray-800">
-            <p className="text-[10px] text-gray-500 font-medium leading-tight">
-                Our security protocol will automatically match your transaction ID. <br/>
-                <span className="font-bold">Avoid duplicate activation attempts.</span>
-            </p>
-          </div>
       </div>
     </div>
   );

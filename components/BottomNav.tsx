@@ -20,8 +20,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, user }) 
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#0d0e20] border-t border-[#1f2248] pb-safe z-50 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
-      <div className="max-w-md mx-auto flex justify-between items-center px-4 h-16 relative">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-pink-200 pb-safe z-50 shadow-[0_-4px_20px_rgba(236,72,153,0.06)]">
+      <div className="max-w-md mx-auto flex justify-between items-center px-4 h-14 relative">
         {/* Left Tabs */}
         <div className="flex flex-1 justify-around">
           {leftTabs.map((tab) => {
@@ -32,11 +32,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, user }) 
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-col items-center justify-center transition-all ${
-                  isActive ? 'text-purple-400 scale-105' : 'text-slate-400 hover:text-slate-200'
+                  isActive ? 'text-blue-600 scale-105' : 'text-slate-400 hover:text-slate-700'
                 }`}
               >
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] font-semibold mt-1 ${isActive ? 'text-purple-400' : 'text-slate-400'}`}>
+                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[9px] font-bold mt-0.5 ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
                   {tab.label}
                 </span>
               </button>
@@ -44,13 +44,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, user }) 
           })}
         </div>
 
-        {/* Center Floating Task Button */}
-        <div className="relative -top-5">
+        {/* Center Floating Task Button - Black with touch of blue */}
+        <div className="relative -top-3.5">
           <button 
             onClick={() => setActiveTab('free_withdraw')}
-            className="w-14 h-14 bg-gradient-to-tr from-purple-600 via-indigo-600 to-indigo-500 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(124,58,237,0.7)] hover:shadow-[0_0_30px_rgba(124,58,237,0.9)] hover:scale-105 active:scale-95 transition-all border-2 border-purple-400/50"
+            className="w-12 h-12 bg-black hover:bg-slate-900 rounded-full flex items-center justify-center text-white shadow-[0_2px_12px_rgba(37,99,235,0.4)] hover:scale-105 active:scale-95 transition-all border-2 border-blue-500"
+            title="Earn Rewards"
           >
-            <Icons.ClipboardList size={26} strokeWidth={2.2} className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <Icons.ClipboardList size={20} strokeWidth={2.2} className="text-blue-400" />
           </button>
         </div>
 
@@ -58,17 +59,17 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, user }) 
         <div className="flex flex-1 justify-around">
           {rightTabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+            const isActive = activeTab === (tab.id === 'history' ? 'transaction_history' : tab.id) || activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id === 'history' ? 'transaction_history' : tab.id)}
                 className={`flex flex-col items-center justify-center transition-all ${
-                  isActive ? 'text-purple-400 scale-105' : 'text-slate-400 hover:text-slate-200'
+                  isActive ? 'text-blue-600 scale-105' : 'text-slate-400 hover:text-slate-700'
                 }`}
               >
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] font-semibold mt-1 ${isActive ? 'text-purple-400' : 'text-slate-400'}`}>
+                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[9px] font-bold mt-0.5 ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
                   {tab.label}
                 </span>
               </button>

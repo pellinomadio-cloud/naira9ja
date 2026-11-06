@@ -20,7 +20,7 @@ export const saveAppSettings = (settings: AppSettings): void => {
     localStorage.setItem('naira9ja_app_settings', JSON.stringify(settings));
     window.dispatchEvent(new Event('naira9ja_app_settings_updated'));
   } catch (e) {
-    console.error('Failed to save app settings:', e);
+    console.warn('Notice saving app settings:', e);
   }
 };
 

@@ -9,14 +9,14 @@ interface NairaCodeCardProps {
   onWithdrawClick: () => void;
 }
 
-const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
+export const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
   nairaCodeObj,
   onBuyCodeClick,
   onWithdrawClick
 }) => {
+  const [copied, setCopied] = useState(false);
   const settings = useAppSettings();
   const nairaCodePrice = settings.nairaCodePrice ?? 7000;
-  const [copied, setCopied] = useState(false);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -24,65 +24,49 @@ const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Case 1: Active, Unused Code
+  // Case 1: Active Code Available and Unused
   if (nairaCodeObj && !nairaCodeObj.isUsed) {
     return (
-      <div className="bg-gradient-to-r from-amber-950/90 via-[#1b1509] to-[#12142e] border-2 border-amber-500/80 rounded-3xl p-5 shadow-[0_10px_30px_rgba(245,158,11,0.25)] space-y-4 my-3 relative overflow-hidden animate-in zoom-in-95 duration-300">
-        {/* Glow */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="flex justify-between items-center relative z-10">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
-              <Icons.Key size={18} />
+      <div className="bg-white border border-pink-200 rounded-3xl p-3.5 shadow-sm shadow-pink-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 my-2">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-xl bg-pink-100 border border-pink-200 flex items-center justify-center text-blue-600 shrink-0">
+            <Icons.Key size={16} />
+          </div>
+          <div>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Active Naira CODE</span>
+              <span className="px-1.5 py-0.2 bg-blue-50 text-blue-700 border border-blue-200 text-[8px] font-mono font-black rounded-full">
+                READY
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-black text-amber-300 uppercase tracking-wider">Active Naira CODE</h3>
-              <p className="text-[10px] text-amber-200/80 font-medium">Approved & Ready for Withdrawal</p>
+            <div className="flex items-center space-x-2 mt-0.5">
+              <span className="font-mono font-black text-slate-900 text-xs tracking-wider select-all">
+                {nairaCodeObj.code}
+              </span>
+              <button
+                onClick={() => handleCopy(nairaCodeObj.code)}
+                className="text-slate-400 hover:text-slate-700 transition-colors"
+                title="Copy Code"
+              >
+                {copied ? <Icons.Check size={11} className="text-emerald-600" /> : <Icons.Copy size={11} />}
+              </button>
             </div>
           </div>
-
-          <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-wider animate-pulse">
-            One-Time Use
-          </span>
         </div>
 
-        {/* Big Code Box */}
-        <div className="bg-[#0b0c1b]/90 border border-amber-500/50 p-4 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
-          <div>
-            <span className="text-[9px] font-extrabold text-amber-400 uppercase tracking-widest block mb-0.5">
-              Your One-Time Voucher CODE
-            </span>
-            <span className="text-xl md:text-2xl font-black font-mono text-amber-300 tracking-widest select-all">
-              {nairaCodeObj.code}
-            </span>
-          </div>
-
+        <div className="flex items-center space-x-1.5 self-end sm:self-center">
           <button
             onClick={() => handleCopy(nairaCodeObj.code)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-1.5 shadow-md active:scale-95 ${
-              copied
-                ? 'bg-emerald-500 text-white'
-                : 'bg-amber-400 hover:bg-amber-300 text-slate-950'
-            }`}
+            className="px-2 py-1 rounded-xl bg-pink-50 hover:bg-pink-100 text-slate-700 border border-pink-200 font-bold text-[10px] transition-colors"
           >
-            {copied ? <Icons.Check size={16} /> : <Icons.Copy size={16} />}
-            <span>{copied ? 'COPIED!' : 'COPY'}</span>
+            {copied ? 'Copied!' : 'Copy'}
           </button>
-        </div>
-
-        {/* Footer & Action */}
-        <div className="flex items-center justify-between pt-1 relative z-10">
-          <p className="text-[10px] text-amber-200/90 font-medium flex items-center space-x-1">
-            <Icons.AlertTriangle size={12} className="text-amber-400 flex-shrink-0" />
-            <span>Expires after 1 successful withdrawal transaction.</span>
-          </p>
 
           <button
             onClick={onWithdrawClick}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-md transition-all active:scale-95 uppercase tracking-wider"
+            className="btn-black-blue px-3 py-1 rounded-xl text-[10px] font-black text-blue-300 uppercase tracking-wider flex items-center space-x-1"
           >
-            Withdraw Now →
+            <span>Withdraw →</span>
           </button>
         </div>
       </div>
@@ -92,25 +76,25 @@ const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
   // Case 2: Code Expired / Used
   if (nairaCodeObj && nairaCodeObj.isUsed) {
     return (
-      <div className="bg-[#12142e] border border-slate-700/80 rounded-3xl p-4 shadow-lg flex items-center justify-between my-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-rose-950/60 border border-rose-800/50 flex items-center justify-center text-rose-400">
-            <Icons.CheckCircle size={20} />
+      <div className="bg-white border border-pink-200 rounded-3xl p-3.5 shadow-sm shadow-pink-500/5 flex items-center justify-between my-2">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+            <Icons.CheckCircle size={16} />
           </div>
           <div>
             <div className="flex items-center space-x-1.5">
-              <h4 className="text-xs font-black text-slate-200">Previous Naira CODE Used</h4>
-              <span className="px-1.5 py-0.2 bg-rose-950 text-rose-300 border border-rose-800/60 text-[9px] font-mono font-bold rounded">
+              <h4 className="text-[11px] font-black text-slate-800">Previous Naira CODE Used</h4>
+              <span className="px-1.5 py-0.2 bg-rose-50 text-rose-700 border border-rose-200 text-[8px] font-mono font-bold rounded-full">
                 EXPIRED
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium">Purchase a new Naira CODE for your next withdrawal.</p>
+            <p className="text-[10px] text-slate-500 font-medium">Purchase a new Naira CODE for your next withdrawal.</p>
           </div>
         </div>
 
         <button
           onClick={onBuyCodeClick}
-          className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95 uppercase tracking-wider"
+          className="btn-black-blue px-2.5 py-1 text-[10px] font-black text-amber-300 rounded-xl uppercase tracking-wider shrink-0"
         >
           Buy New Code
         </button>
@@ -120,20 +104,20 @@ const NairaCodeCard: React.FC<NairaCodeCardProps> = ({
 
   // Case 3: No Naira CODE
   return (
-    <div className="bg-gradient-to-r from-[#181a3d] to-[#12142e] border border-[#2b3166] rounded-3xl p-4 shadow-lg flex items-center justify-between my-3">
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-          <Icons.Key size={20} />
+    <div className="bg-white border border-pink-200 rounded-3xl p-3.5 shadow-sm shadow-pink-500/5 flex items-center justify-between my-2">
+      <div className="flex items-center space-x-2.5">
+        <div className="w-8 h-8 rounded-xl bg-pink-100 border border-pink-200 flex items-center justify-center text-blue-600 shrink-0">
+          <Icons.Key size={16} />
         </div>
         <div>
-          <h4 className="text-xs font-black text-white">Naira CODE Required</h4>
-          <p className="text-[10px] text-slate-400 font-medium">Buy a 1-time activation code to unlock withdrawals.</p>
+          <h4 className="text-[11px] font-black text-slate-800">Naira CODE Required</h4>
+          <p className="text-[10px] text-slate-500 font-medium">Get a 1-time activation code to unlock withdrawals.</p>
         </div>
       </div>
 
       <button
         onClick={onBuyCodeClick}
-        className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95 uppercase tracking-wider"
+        className="btn-black-blue px-2.5 py-1 text-[10px] font-black text-amber-300 rounded-xl uppercase tracking-wider shrink-0"
       >
         Get CODE (₦{nairaCodePrice.toLocaleString()})
       </button>

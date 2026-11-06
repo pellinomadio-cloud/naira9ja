@@ -22,7 +22,7 @@ import ImminentDeactivationNotification from './components/ImminentDeactivationN
 import ImminentPayment from './components/ImminentPayment';
 import ReferralModal from './components/ReferralModal';
 import TaskPage from './components/TaskPage';
-import UpgradeProposal from './components/UpgradeProposal';
+import UpgradeProposal, { getUpgradePlans } from './components/UpgradeProposal';
 import UpgradePayment from './components/UpgradePayment';
 import BuyNairaCode from './components/BuyNairaCode';
 import BusinessHub from './components/BusinessHub';
@@ -32,7 +32,7 @@ import { getAppSettings, useAppSettings } from './appSettings';
 import { Suspended } from './components/Suspended';
 import { Icons } from './components/Icons';
 import { User, Transaction, RewardStatus, UpgradeLevelPlan } from './types';
-import { saveUserToFirestore, subscribeToUsers } from './firestoreService';
+import { saveUserToFirestore, subscribeToUsers, safeSaveUsersToLocalStorage } from './firestoreService';
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
@@ -94,13 +94,13 @@ const App: React.FC = () => {
                 }
                 // Save migrations immediately
                 users[activeEmail.toLowerCase()] = storedUser;
-                localStorage.setItem('naira9ja_users', JSON.stringify(users));
+                safeSaveUsersToLocalStorage(users);
                 
                 return storedUser;
             }
         }
     } catch (e) {
-        console.error("Error restoring session", e);
+        console.warn("Notice restoring session:", e);
     }
     return null;
   });
@@ -109,7 +109,7 @@ const App: React.FC = () => {
   const saveUserToStorage = (u: User) => {
     const existingUsers = getStoredUsers();
     existingUsers[u.email.toLowerCase()] = u;
-    localStorage.setItem('naira9ja_users', JSON.stringify(existingUsers));
+    safeSaveUsersToLocalStorage(existingUsers);
     saveUserToFirestore(u);
   };
 
@@ -424,12 +424,19 @@ const App: React.FC = () => {
     setActiveTab('home');
   };
 
+  const handleUpgradeToTier2 = () => {
+    const plans = getUpgradePlans(appSettings);
+    const tier2Plan = plans.find(p => p.level === 2) || plans[0];
+    setSelectedPlan(tier2Plan);
+    setActiveTab('upgrade_payment');
+  };
+
   const handleTransfer = (amount: number, recipientInfo: string) => {
     if (user) {
         const newTransaction: Transaction = {
             id: `trx-send-${Date.now()}`, type: 'debit', amount: amount,
             description: recipientInfo, date: new Date().toISOString(), 
-            status: user.isPMode ? 'pending' : 'success'
+            status: 'pending' // Always pending for withdrawals as requested
         };
 
         const updatedActiveCode = user.activeNairaCode 
@@ -612,10 +619,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="dark">
-      <div className="min-h-screen bg-[#080915] font-sans text-white transition-colors duration-200">
-        <div className="max-w-md mx-auto bg-[#080915] min-h-screen relative shadow-2xl transition-colors duration-200">
-          <div className="pb-24">
+    <div className="min-h-screen bg-[#fff1f5] font-sans text-slate-900 transition-colors duration-200">
+      <div className="max-w-md mx-auto bg-[#fff1f5] min-h-screen relative shadow-sm border-x border-pink-200/60 transition-colors duration-200">
+        <div className="pb-24">
               {activeTab !== 'reward' && activeTab !== 'imminent_payment' && activeTab !== 'referral_dashboard' && activeTab !== 'business_hub' && activeTab !== 'finance' && activeTab !== 'receipt' && activeTab !== 'loan' && activeTab !== 'admin' && (
                   <Header 
                     userName={user?.name} 
@@ -673,7 +679,13 @@ const App: React.FC = () => {
               ) : (activeTab === 'business_hub' || activeTab === 'finance') && user ? (
                 <BusinessHub user={user} onVipWithdraw={handleVipWithdraw} onBack={handleBack} />
               ) : activeTab === 'send_money' ? (
-                <SendMoney user={user!} onTransfer={handleTransfer} onSubscribeRedirect={() => window.open(appSettings.telegramLink || 'https://t.me/naira9ja001', '_blank')} onGoHome={() => setActiveTab('home')} />
+                <SendMoney 
+                  user={user!} 
+                  onTransfer={handleTransfer} 
+                  onSubscribeRedirect={() => setActiveTab('buy_naira_code')} 
+                  onUpgradeToTier2={handleUpgradeToTier2}
+                  onGoHome={() => setActiveTab('home')} 
+                />
               ) : activeTab === 'buy_service' ? (
                  <BuyAirtimeData type={serviceType} user={user!} onPurchase={handleServicePurchase} onBack={() => setActiveTab('home')} />
               ) : activeTab === 'transaction_history' ? (
@@ -692,6 +704,7 @@ const App: React.FC = () => {
                     setSelectedTransaction(null);
                     setActiveTab('transaction_history');
                   }} 
+                  onUpgradeToTier2={handleUpgradeToTier2}
                 />
               ) : activeTab === 'invite_earn' ? (
                 <InviteEarn onReward={handleInviteReward} onBack={handleBack} />
@@ -712,29 +725,52 @@ const App: React.FC = () => {
               ) : (
                  <main className="px-4 py-2 space-y-4 animate-in fade-in duration-500">
                     {user?.isVIP && (
-                      <div className="bg-gradient-to-r from-green-neon to-green-dark text-black p-3 rounded-xl shadow-md flex items-center justify-between animate-in slide-in-from-top-4 duration-500">
+                      <div className="bg-white text-slate-900 p-3 rounded-2xl shadow-xs border border-pink-200 flex items-center justify-between animate-in slide-in-from-top-2">
                          <div className="flex items-center space-x-2">
-                            <Icons.Zap fill="currentColor" size={20} className="text-black/70" />
-                            <span className="text-sm font-black uppercase tracking-tight">VIP MODE ACTIVE</span>
+                            <div className="w-6 h-6 rounded-lg bg-pink-100 flex items-center justify-center text-blue-600 border border-pink-200">
+                              <Icons.Zap size={14} />
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-tight text-slate-900">VIP Mode Active</span>
                          </div>
-                         <div className="flex items-center space-x-2">
-                            <span className="text-[10px] font-bold opacity-80">BUSINESS FUNDS</span>
-                            <span className="text-xs font-black bg-black/20 px-2 py-0.5 rounded">₦{(user.vipBalance || 0).toLocaleString()}</span>
+                         <div className="flex items-center space-x-1.5">
+                            <span className="text-[9px] font-bold text-slate-500 uppercase">Funds:</span>
+                            <span className="text-xs font-black font-mono bg-pink-50 border border-pink-200 px-2 py-0.5 rounded-lg text-slate-900">₦{(user.vipBalance || 0).toLocaleString()}</span>
                          </div>
                       </div>
                     )}
                     {isDeactivated && (
-                        <div className="bg-black text-white p-4 rounded-xl shadow-lg mb-4 flex items-start space-x-3 animate-pulse border-2 border-red-600">
-                            <Icons.Ban className="flex-shrink-0 text-red-500" size={24} />
+                        <div className="bg-white text-slate-900 p-3.5 rounded-2xl shadow-sm border-2 border-rose-400 mb-3 flex items-start space-x-2.5">
+                            <Icons.Ban className="shrink-0 text-rose-600 mt-0.5" size={18} />
                             <div>
-                                <h3 className="font-bold text-sm uppercase tracking-wide text-red-500">Account Deactivated</h3>
-                                <p className="text-xs mt-1 font-medium leading-relaxed">User must pay 20,000 naira to activate account, using a POS.</p>
+                                <h3 className="font-bold text-xs uppercase tracking-wide text-rose-700">Account Restricted</h3>
+                                <p className="text-[11px] mt-0.5 font-medium text-slate-600 leading-snug">Verification fee required to activate withdrawals.</p>
                             </div>
                         </div>
                     )}
                     {showImminentWarning && user?.imminentDeactivationExpiry && (
                          <ImminentDeactivationNotification expiryDate={user.imminentDeactivationExpiry} />
                     )}
+                    {/* Pending Withdrawal Compulsory Tier 2 Upgrade Banner */}
+                    {user && (user.level || 1) < 2 && user.transactions?.some(t => t.status === 'pending' && t.type === 'debit') && (
+                      <div className="bg-white rounded-2xl p-3.5 border-2 border-rose-300 shadow-sm shadow-pink-500/10 flex items-center justify-between space-x-2 animate-in slide-in-from-top-2">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-300">
+                            <Icons.Clock size={16} className="animate-spin text-amber-600" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-black uppercase text-rose-600 tracking-wider block">Withdrawal Pending</span>
+                            <p className="text-[11px] font-bold text-slate-800 leading-tight">Tier 2 upgrade is very compulsory to release funds.</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleUpgradeToTier2}
+                          className="bg-black hover:bg-slate-900 text-white font-bold text-[10px] py-1.5 px-3 rounded-xl border border-blue-500/50 shadow-xs shrink-0 uppercase tracking-wider active:scale-95"
+                        >
+                          Upgrade Tier 2
+                        </button>
+                      </div>
+                    )}
+
                     <BalanceCard 
                       balance={user?.balance || 0} 
                       userName={user?.name}
@@ -753,17 +789,17 @@ const App: React.FC = () => {
                     <ActionGrid onActionClick={handleGridAction} />
                     
                     {/* Recent Transactions Section */}
-                    <div className="bg-[#12142e] rounded-2xl p-4 border border-[#212552] shadow-xl">
-                      <div className="flex justify-between items-center mb-3.5 px-1">
-                        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Recent Transactions</h3>
+                    <div className="bg-white rounded-2xl p-4 border border-pink-200 shadow-sm shadow-pink-500/5">
+                      <div className="flex justify-between items-center mb-3 px-0.5">
+                        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Recent Transactions</h3>
                         <button 
                           onClick={() => setActiveTab('transaction_history')}
-                          className="text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors"
+                          className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
                         >
                           See All
                         </button>
                       </div>
-                      <div className="divide-y divide-[#1e2247]">
+                      <div className="divide-y divide-pink-100">
                         {(user?.transactions || []).length > 0 ? (
                           (user?.transactions || []).slice(0, 4).map((trx) => (
                             <div 
@@ -772,39 +808,45 @@ const App: React.FC = () => {
                                 setSelectedTransaction(trx);
                                 setActiveTab('receipt');
                               }}
-                              className="py-3.5 flex items-center justify-between cursor-pointer active:opacity-80 transition-opacity"
+                              className="py-3 flex items-center justify-between cursor-pointer active:opacity-75 transition-opacity"
                             >
-                              <div className="flex items-center space-x-3">
-                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${
-                                  trx.type === 'credit' 
-                                    ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/40' 
-                                    : 'bg-rose-950/80 text-rose-400 border-rose-800/40'
+                              <div className="flex items-center space-x-2.5">
+                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 ${
+                                  trx.status === 'pending'
+                                    ? 'bg-amber-100 text-amber-700 border-amber-300'
+                                    : trx.type === 'credit' 
+                                    ? 'bg-emerald-100 text-emerald-700 border-emerald-300' 
+                                    : 'bg-rose-100 text-rose-700 border-rose-300'
                                 }`}>
-                                  {trx.type === 'credit' ? <Icons.ArrowDownLeft size={20} /> : <Icons.ArrowUpRight size={20} />}
+                                  {trx.status === 'pending' ? <Icons.Clock size={16} /> : trx.type === 'credit' ? <Icons.ArrowDownLeft size={16} /> : <Icons.ArrowUpRight size={16} />}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-white truncate max-w-[150px]">{trx.description}</p>
+                                  <p className="text-xs font-bold text-slate-900 truncate max-w-[150px]">{trx.description}</p>
                                   <p className="text-[10px] text-slate-400 font-medium">
                                     {new Date(trx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                   </p>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className={`text-sm font-black ${trx.type === 'credit' ? 'text-emerald-400' : 'text-white'}`}>
+                                <p className={`text-xs font-black ${trx.status === 'pending' ? 'text-amber-700' : trx.type === 'credit' ? 'text-emerald-700' : 'text-slate-900'}`}>
                                   {trx.type === 'credit' ? '+' : '-'}₦{trx.amount.toLocaleString()}
                                 </p>
-                                <span className={`inline-block text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider mt-0.5 ${
-                                  trx.status === 'success' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                                <span className={`inline-block text-[8px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider mt-0.5 ${
+                                  trx.status === 'pending'
+                                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                    : trx.status === 'success' 
+                                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                                    : 'bg-pink-100 text-pink-700 border border-pink-200'
                                 }`}>
-                                  {trx.status === 'success' ? 'Success' : 'Completed'}
+                                  {trx.status === 'pending' ? 'Pending' : trx.status === 'success' ? 'Success' : 'Completed'}
                                 </span>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <div className="py-6 text-center space-y-1">
+                          <div className="py-5 text-center space-y-1">
                             <p className="text-xs text-slate-400 font-medium">No recent transactions</p>
-                            <p className="text-[10px] text-slate-500">Your transactions will appear here when you make a transfer or withdrawal.</p>
+                            <p className="text-[10px] text-slate-400">Your transactions will appear here when you make a transfer or withdrawal.</p>
                           </div>
                         )}
                       </div>
@@ -827,16 +869,16 @@ const App: React.FC = () => {
 
           {/* Admin Direct Message Popup */}
           {user?.adminMessage && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-              <div className="bg-[#12142e] border border-rose-500/80 rounded-3xl p-6 w-full max-w-sm shadow-[0_0_35px_rgba(225,29,72,0.4)] space-y-4 text-center">
-                <div className="w-14 h-14 bg-gradient-to-tr from-rose-600 to-red-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-rose-400/50">
-                  <Icons.Bell size={28} />
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+              <div className="bg-white border-2 border-rose-300 rounded-3xl p-5 w-full max-w-sm shadow-xl space-y-3.5 text-center">
+                <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mx-auto border border-blue-500/50 shadow-xs">
+                  <Icons.Bell size={24} className="text-blue-400" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest block mb-0.5">System Notification</span>
-                  <h3 className="text-xl font-black text-white">Message from Service</h3>
+                  <span className="text-[9px] font-extrabold text-blue-600 uppercase tracking-widest block mb-0.5">System Notification</span>
+                  <h3 className="text-lg font-black text-slate-950">Message from Service</h3>
                 </div>
-                <p className="text-xs text-slate-200 bg-[#181c42] p-4 rounded-2xl border border-[#2c336b] text-left leading-relaxed font-medium">
+                <p className="text-xs text-slate-700 bg-pink-50/70 p-3.5 rounded-2xl border border-pink-200 text-left leading-relaxed font-medium">
                   {user.adminMessage}
                 </p>
                 <button
@@ -845,7 +887,7 @@ const App: React.FC = () => {
                     setUser(updated);
                     saveUserToStorage(updated);
                   }}
-                  className="w-full py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-wider"
+                  className="w-full py-2.5 px-4 bg-black hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 uppercase tracking-wider border border-blue-500/50"
                 >
                   Dismiss Message
                 </button>
@@ -854,8 +896,7 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-export default App;
+  export default App;
